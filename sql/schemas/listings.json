@@ -1,0 +1,123 @@
+[
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "listing_id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "url",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "title",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "brand",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "model",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "brand_norm",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Marque normalisée pour les comparables"
+  },
+  {
+    "name": "model_norm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "version",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "year",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "mileage_km",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "fuel",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gearbox",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "price_eur",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "seller_type",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "city",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "postal_code",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "lat",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "lon",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "description",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "photo_url",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "first_seen_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "last_seen_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "enrichment_status",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  }
+]

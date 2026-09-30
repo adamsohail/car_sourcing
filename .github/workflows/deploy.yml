@@ -1,0 +1,34 @@
+name: Déploiement
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Variables du dépôt (Settings > Secrets and variables > Actions > Variables) :
+# GCP_PROJECT, GCP_REGION, WIF_PROVIDER, DEPLOYER_SA — valeurs affichées par `terraform output`.
+concurrency: deploy
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT }}/car-sourcing/app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen && uv run pytest -q
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+      - run: docker build -t "$IMAGE" . && docker push "$IMAGE"
+      - name: Job d'ingestion
+        run: gcloud run jobs update car-sourcing-ingest --image "$IMAGE" --region ${{ vars.GCP_REGION }}
+      - name: Service web
+        run: gcloud run services update car-sourcing-web --image "$IMAGE" --region ${{ vars.GCP_REGION }}

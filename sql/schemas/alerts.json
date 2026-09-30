@@ -1,0 +1,32 @@
+[
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "listing_id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "sent_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "alert_level",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "price_eur",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "telegram_message_id",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+]

@@ -1,0 +1,97 @@
+[
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "listing_id",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "evaluated_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "config_version",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "exclusion_reason",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "exclusion_detail",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "km_per_year",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "distance_km",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "market_price_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "resale_price_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "negotiation_discount_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "comparables_count",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "comparables_widened",
+    "type": "BOOL",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "reliability",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "fees_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "transport_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "margin_eur",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "alert_level",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "price_eur",
+    "type": "INT64",
+    "mode": "NULLABLE"
+  }
+]

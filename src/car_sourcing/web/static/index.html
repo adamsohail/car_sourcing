@@ -1,0 +1,1777 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sourcing auto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --paper: #EDF0F4; --surface: #FFFFFF; --surface-2: #F5F7FA; --line: #D8DEE6; --line-strong: #B7C0CC;
+  --ink: #15203A; --ink-2: #3B4760; --muted: #647089;
+  --blue: #1D4FB0; --blue-ink: #FFFFFF; --blue-soft: #E2EAFA;
+  --gain: #0B7A52; --gain-soft: #DCF2E8; --gain-bar: #19A571;
+  --prio: #F5B800; --prio-soft: #FFF3C9; --prio-line: #D9A300;
+  --stop: #B3372B; --stop-soft: #FBE5E1;
+  --bar-buy: #15203A; --bar-fees: #5A6781; --bar-transport: #97A2B5; --bar-nego: #AEB8C7;
+  --glass: #C9D6E8; --tyre: #232B3B; --hub: #C3CAD6;
+  --scrim: rgba(12, 18, 32, .45);
+  --font: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-num: "Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --nav-h: 62px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1420; --surface: #161E2E; --surface-2: #1B2537; --line: #283550; --line-strong: #3A4968;
+    --ink: #E7ECF5; --ink-2: #B9C3D5; --muted: #8B97AE;
+    --blue: #7EA6FF; --blue-ink: #0B1530; --blue-soft: #1D2A48;
+    --gain: #54D6A0; --gain-soft: #123629; --gain-bar: #2FBF84;
+    --prio: #FFC933; --prio-soft: #372E10; --prio-line: #E0AE1F;
+    --stop: #FF8575; --stop-soft: #3B1D1A;
+    --bar-buy: #D3DBEA; --bar-fees: #8594B2; --bar-transport: #5A6885; --bar-nego: #465471;
+    --glass: #3C4D6B; --tyre: #05080F; --hub: #6B7890;
+    --scrim: rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1420; --surface: #161E2E; --surface-2: #1B2537; --line: #283550; --line-strong: #3A4968;
+  --ink: #E7ECF5; --ink-2: #B9C3D5; --muted: #8B97AE;
+  --blue: #7EA6FF; --blue-ink: #0B1530; --blue-soft: #1D2A48;
+  --gain: #54D6A0; --gain-soft: #123629; --gain-bar: #2FBF84;
+  --prio: #FFC933; --prio-soft: #372E10; --prio-line: #E0AE1F;
+  --stop: #FF8575; --stop-soft: #3B1D1A;
+  --bar-buy: #D3DBEA; --bar-fees: #8594B2; --bar-transport: #5A6885; --bar-nego: #465471;
+  --glass: #3C4D6B; --tyre: #05080F; --hub: #6B7890;
+  --scrim: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; background: var(--paper); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.45;
+  font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--blue); }
+:focus-visible { outline: 2.5px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+/* ---------- Coquille ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { white-space: nowrap; display: flex; align-items: center; gap: 9px; font: 600 19px/1 var(--font-num); letter-spacing: .005em; color: var(--ink); text-decoration: none; }
+.brand svg { width: 26px; height: 26px; flex: none; }
+.topbar .base-pill { margin-left: auto; }
+.base-pill {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; background: var(--surface); text-decoration: none; white-space: nowrap;
+}
+.base-pill svg { width: 14px; height: 14px; }
+.base-pill.missing { border-color: var(--prio-line); background: var(--prio-soft); color: var(--ink); }
+
+.rail {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.rail .brand, .rail .rail-foot { display: none; }
+.nav { display: flex; height: var(--nav-h); }
+.nav a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  font-size: 11.5px; font-weight: 600; color: var(--muted); text-decoration: none; position: relative;
+}
+.nav a svg { width: 23px; height: 23px; }
+.nav a[aria-current="page"] { color: var(--blue); }
+.nav .badge {
+  position: absolute; top: 6px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; background: var(--prio); color: #231A00; font: 700 11px/18px var(--font-num); text-align: center;
+}
+main { width: 100%; max-width: 780px; margin: 0 auto; padding: 14px 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); }
+
+@media (min-width: 960px) {
+  .topbar { display: none; }
+  .rail {
+    top: 0; bottom: 0; right: auto; width: 236px; border-top: 0; border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 26px;
+    padding: calc(env(safe-area-inset-top, 0px) + 22px) 14px calc(env(safe-area-inset-bottom, 0px) + 18px);
+  }
+  .rail .brand { white-space: nowrap; display: flex; padding: 0 10px; }
+  .nav { flex-direction: column; height: auto; gap: 2px; }
+  .nav a { flex: none; flex-direction: row; justify-content: flex-start; gap: 12px; font-size: 15.5px; font-weight: 500; padding: 10px 12px; border-radius: 10px; color: var(--ink-2); }
+  .nav a:hover { background: var(--surface-2); }
+  .nav a[aria-current="page"] { background: var(--blue-soft); color: var(--blue); font-weight: 600; }
+  .nav a svg { width: 20px; height: 20px; }
+  .nav .badge { position: static; margin-left: auto; }
+  .rail .rail-foot { display: block; margin-top: auto; padding: 0 10px; font-size: 13px; color: var(--muted); }
+  .rail-foot .base-pill { margin-top: 6px; }
+  body { padding-left: 236px; }
+  main { padding: 34px 40px 60px; }
+}
+
+/* ---------- Titres et textes ---------- */
+.page-head { margin: 6px 0 14px; }
+h1 { font: 600 28px/1.12 var(--font-num); letter-spacing: -.005em; margin: 0 0 6px; }
+h2 { font: 600 20px/1.2 var(--font-num); margin: 0 0 10px; }
+h3 { margin: 0; }
+.lede { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.muted { color: var(--muted); }
+.small { font-size: 13.5px; }
+section + section { margin-top: 26px; }
+
+/* ---------- Contrôles ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent;
+  font-weight: 600; font-size: 15px; text-decoration: none; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; }
+.btn-primary { background: var(--blue); color: var(--blue-ink); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost { background: var(--surface); border-color: var(--line-strong); color: var(--ink); }
+.btn-quiet { background: transparent; color: var(--ink-2); padding: 0 10px; }
+.btn-sm { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 9px; }
+.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 10px; border: 0; background: transparent; color: var(--ink); }
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn svg { width: 22px; height: 22px; }
+
+.tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button {
+  flex: none; background: none; border: 0; padding: 10px 0 9px; margin-bottom: -1px;
+  border-bottom: 2.5px solid transparent; font-weight: 600; font-size: 15px; color: var(--muted);
+}
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--blue); }
+.tabs .count { font-family: var(--font-num); font-weight: 500; margin-left: 5px; color: var(--muted); }
+@media (min-width: 960px) { .tabs { margin: 0; padding: 0; } }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 14px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2);
+  font-size: 14px; font-weight: 500;
+}
+.chip svg { width: 16px; height: 16px; }
+.chip[aria-pressed="true"] { background: var(--prio-soft); border-color: var(--prio-line); color: var(--ink); font-weight: 600; }
+.chip.sel[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.chip .count { font-family: var(--font-num); opacity: .75; }
+.select-chip { position: relative; display: inline-flex; }
+.select-chip select {
+  appearance: none; -webkit-appearance: none; min-height: 36px; padding: 0 28px 0 11px; border-radius: 999px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); font-size: 14px; font-weight: 500;
+}
+.select-chip svg { position: absolute; right: 10px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+.toolbar .spacer { flex: 1; }
+
+/* ---------- Notes ---------- */
+.note {
+  display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; margin: 0 0 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 14.5px; color: var(--ink-2);
+}
+.note > svg { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--muted); }
+.note .note-body { flex: 1; min-width: 0; }
+.note strong { color: var(--ink); }
+.note .note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.note.warn { border-color: var(--prio-line); background: var(--prio-soft); }
+.note.warn > svg { color: var(--ink); }
+.note.stop { border-color: color-mix(in srgb, var(--stop) 50%, var(--line)); background: var(--stop-soft); }
+.note.stop > svg { color: var(--stop); }
+.note.good { border-color: color-mix(in srgb, var(--gain) 45%, var(--line)); background: var(--gain-soft); }
+.note.good > svg { color: var(--gain); }
+.inline-form { display: flex; gap: 8px; flex-wrap: nowrap; }
+.inline-form .input { width: 110px; flex: none; }
+.note.compact { align-items: center; padding: 8px 8px 8px 14px; }
+.note.compact > svg { margin-top: 0; }
+.note.compact .note-body { font-size: 14px; }
+
+/* ---------- Carte d'opportunité ---------- */
+.card {
+  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 14px 12px;
+}
+.card + .card { margin-top: 10px; }
+.card.prio { border-color: var(--prio-line); box-shadow: inset 5px 0 0 var(--prio); padding-left: 18px; }
+.card.dim { opacity: .72; }
+.card-top { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start; }
+.glyph { width: 58px; height: 26px; margin-top: 3px; }
+.glyph svg { width: 100%; height: 100%; display: block; }
+.card-title { font: 600 18px/1.15 var(--font-num); margin: 0; }
+.card-link { all: unset; cursor: pointer; }
+.card-link::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.card-link:focus-visible::after { outline: 2.5px solid var(--blue); outline-offset: 2px; }
+.card-version { font-size: 14px; color: var(--muted); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-price { font: 600 16px/1.2 var(--font-num); margin-top: 5px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card-price s { color: var(--muted); font-weight: 500; font-size: 14px; }
+.card-margin { text-align: right; }
+.m-val { display: block; font: 700 25px/1 var(--font-num); color: var(--gain); letter-spacing: -.01em; white-space: nowrap; }
+.m-val.neg { color: var(--stop); }
+.m-val.flat { color: var(--ink-2); }
+.m-lab { display: block; font-size: 12.5px; color: var(--muted); margin-top: 4px; white-space: nowrap; }
+.tag {
+  display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 600; background: var(--surface-2); color: var(--ink-2); white-space: nowrap;
+}
+.tag svg { width: 13px; height: 13px; }
+.tag.prio { background: var(--prio-soft); color: var(--ink); }
+.tag.drop { background: var(--gain-soft); color: var(--gain); }
+.tag.warn { background: var(--prio-soft); color: var(--ink); }
+.tag.stop { background: var(--stop-soft); color: var(--stop); }
+.tag.info { background: var(--blue-soft); color: var(--blue); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.specs { display: flex; flex-wrap: wrap; gap: 3px 14px; list-style: none; margin: 10px 0 0; padding: 0; font-size: 14.5px; color: var(--ink-2); }
+.specs b { font-weight: 600; color: var(--ink); font-family: var(--font-num); font-size: 15.5px; }
+.specs .over { color: var(--stop); }
+
+/* Répartition de la cote : l'élément signature */
+.split { display: flex; height: 12px; border-radius: 4px; overflow: hidden; gap: 2px; margin-top: 14px; background: var(--surface); }
+.split.lg { height: 18px; border-radius: 5px; }
+.split span { display: block; min-width: 2px; }
+.s-buy { background: var(--bar-buy); }
+.s-fees { background: var(--bar-fees); }
+.s-transport { background: var(--bar-transport); }
+.s-nego { background: repeating-linear-gradient(135deg, var(--bar-nego) 0 2.5px, transparent 2.5px 5px); box-shadow: inset 0 0 0 1px var(--bar-nego); }
+.s-gain { background: var(--gain-bar); }
+.s-over { background: repeating-linear-gradient(135deg, var(--stop) 0 2.5px, transparent 2.5px 5px); box-shadow: inset 0 0 0 1px var(--stop); }
+.split-legend { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted); margin-top: 6px; }
+.split-legend b { color: var(--ink-2); font-weight: 600; font-family: var(--font-num); font-size: 14px; }
+.card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 13.5px; color: var(--muted); margin-top: 10px; }
+.card-foot .it { display: inline-flex; align-items: center; gap: 5px; }
+.card-foot svg { width: 14px; height: 14px; }
+
+.signal { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.signal i { display: block; width: 3.5px; border-radius: 1px; background: var(--line-strong); }
+.signal i:nth-child(1) { height: 5px; } .signal i:nth-child(2) { height: 8.5px; } .signal i:nth-child(3) { height: 12px; }
+.signal.l3 i { background: var(--gain); }
+.signal.l2 i:nth-child(-n+2) { background: var(--ink-2); }
+.signal.l1 i:nth-child(1) { background: var(--stop); }
+
+.fb { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+.fb { grid-template-columns: minmax(0, 1fr) minmax(0, 1.28fr) minmax(0, 1fr); }
+.fb button { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fb button {
+  min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2);
+  font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 4px; white-space: nowrap;
+}
+.fb button svg { width: 17px; height: 17px; flex: none; }
+.fb button:hover { border-color: var(--line-strong); }
+.fb button[data-val="interessant"][aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+.fb button[data-val="pas_interessant"][aria-pressed="true"] { background: var(--stop-soft); border-color: var(--stop); color: var(--stop); }
+.fb button[data-val="achete"][aria-pressed="true"] { background: var(--gain-soft); border-color: var(--gain); color: var(--gain); }
+@media (max-width: 370px) { .fb button { font-size: 13.5px; } .fb button svg { display: none; } }
+
+.empty { text-align: center; padding: 34px 18px; border: 1px dashed var(--line-strong); border-radius: 14px; color: var(--ink-2); }
+.empty h3 { font: 600 19px var(--font-num); color: var(--ink); margin-bottom: 6px; }
+.empty p { margin: 0 auto 14px; max-width: 42ch; }
+.empty .btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* ---------- Liste des annonces ---------- */
+.search { position: relative; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); }
+.search .input { padding-left: 40px; }
+.rows { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.row-item {
+  all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  width: 100%; padding: 11px 14px; border-top: 1px solid var(--line);
+}
+.row-item:first-child { border-top: 0; }
+.row-item:hover { background: var(--surface-2); }
+.row-item:focus-visible { outline: 2.5px solid var(--blue); outline-offset: -2.5px; }
+.ri-title { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ri-sub { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 13.5px; color: var(--muted); margin-top: 1px; }
+.ri-end { text-align: right; font-size: 13.5px; max-width: 42vw; }
+.ri-end .v { font: 700 17px var(--font-num); display: block; }
+.ri-end .v.gain { color: var(--gain); }
+.ri-end .v.flat { color: var(--ink-2); font-weight: 600; }
+.more { display: flex; justify-content: center; margin-top: 12px; }
+
+/* ---------- Fiche détaillée (tiroir) ---------- */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; opacity: 0; transition: opacity .22s ease; }
+.scrim.open { opacity: 1; }
+.sheet {
+  position: fixed; z-index: 41; top: 0; bottom: 0; left: 0; right: 0; background: var(--paper);
+  display: flex; flex-direction: column; transform: translateY(100%); transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+}
+.sheet.open { transform: none; }
+.sheet-head {
+  display: flex; align-items: center; gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 8px) 10px 8px 6px;
+  border-bottom: 1px solid var(--line); background: var(--surface);
+}
+.sheet-head .src { font-size: 14px; color: var(--muted); }
+.sheet-head .btn { margin-left: auto; }
+.sheet-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 16px 16px 28px; }
+.sheet-foot { padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 10px); border-top: 1px solid var(--line); background: var(--surface); }
+.sheet-foot .fb { margin-top: 0; }
+@media (min-width: 960px) {
+  .sheet { left: auto; width: min(580px, 94vw); transform: translateX(100%); border-left: 1px solid var(--line); box-shadow: -18px 0 40px rgba(12, 18, 32, .12); }
+  .sheet-body { padding: 22px 26px 34px; }
+  .sheet-foot { padding-left: 26px; padding-right: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { .sheet, .scrim { transition: none; } }
+
+.d-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; align-items: end; }
+.d-hero .glyph-lg { grid-column: 1 / -1; width: 128px; height: 54px; margin-bottom: 4px; }
+.d-title { font: 600 26px/1.1 var(--font-num); margin: 0; }
+.d-version { color: var(--muted); margin-top: 3px; }
+.d-price { text-align: right; }
+.d-price .p { font: 700 26px/1 var(--font-num); display: block; }
+.d-price s { color: var(--muted); font-size: 14px; }
+
+.receipt { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 2px 16px; }
+.receipt .r { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 10px 0; border-bottom: 1px dashed var(--line-strong); }
+.receipt .r:last-child { border-bottom: 0; }
+.receipt .k { color: var(--ink-2); display: flex; align-items: center; gap: 9px; }
+.receipt .k small { display: block; color: var(--muted); font-size: 13px; }
+.receipt .v { font: 600 17px var(--font-num); white-space: nowrap; }
+.receipt .r.sub .k, .receipt .r.sub .v { color: var(--ink); font-weight: 700; }
+.receipt .r.total { padding: 14px 0 12px; }
+.receipt .r.total .k { color: var(--ink); font-weight: 700; font-size: 17px; }
+.receipt .r.total .v { font-size: 30px; font-weight: 700; color: var(--gain); letter-spacing: -.01em; }
+.receipt .r.total .v.neg { color: var(--stop); }
+.sw { width: 12px; height: 12px; border-radius: 3px; flex: none; display: inline-block; }
+.threshold { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis-l { fill: var(--muted); font: 11px var(--font); }
+.chart .dot { fill: var(--bar-fees); fill-opacity: .7; }
+.chart .dot.pro { fill: none; stroke: var(--bar-fees); stroke-width: 1.5; }
+.chart .me { fill: var(--prio); stroke: var(--ink); stroke-width: 1.5; }
+.chart .med { stroke: var(--gain); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.chart .med-l { fill: var(--gain); font: 600 11.5px var(--font-num); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); margin-top: 6px; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.comp-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+.comp-table th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12.5px; padding: 0 6px 6px 0; }
+.comp-table td { padding: 7px 6px 7px 0; border-top: 1px solid var(--line); font-family: var(--font-num); font-size: 15px; }
+.comp-table td.t { font-family: var(--font); font-size: 13.5px; color: var(--ink-2); }
+.comp-table .r { text-align: right; padding-right: 14px; }
+.specs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; margin: 0; }
+.specs-grid dt { font-size: 13px; color: var(--muted); }
+.specs-grid dd { margin: 1px 0 0; font-weight: 600; }
+.desc { white-space: pre-wrap; line-height: 1.55; margin: 0; color: var(--ink-2); max-width: 70ch; }
+mark { background: var(--stop-soft); color: var(--stop); font-weight: 700; padding: 0 2px; border-radius: 3px; }
+.meta { font-size: 13px; color: var(--muted); margin-top: 22px; }
+
+/* ---------- Formulaires ---------- */
+.input, select.input, textarea.input {
+  width: 100%; min-height: 46px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 10px;
+  background: var(--surface); color: var(--ink); font-size: 16px;
+}
+textarea.input { padding: 11px 12px; min-height: 110px; resize: vertical; line-height: 1.5; }
+select.input { appearance: none; -webkit-appearance: none; padding-right: 36px; background-image: none; }
+.input::placeholder { color: var(--muted); opacity: .8; }
+.input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 25%, transparent); }
+.field { display: grid; gap: 5px; align-content: start; }
+.field > label, .field > .label { font-weight: 600; font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.field .help { font-size: 13.5px; color: var(--muted); }
+.field .err-msg { font-size: 13.5px; color: var(--stop); font-weight: 600; }
+.field.err .input { border-color: var(--stop); }
+.iw { position: relative; }
+.iw .unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 15px; }
+.iw select + svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+.form-grid .full { grid-column: 1 / -1; }
+.seg-ctl { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 10px; padding: 3px; background: var(--surface); gap: 2px; width: 100%; }
+.seg-ctl button { flex: 1; min-height: 38px; border: 0; border-radius: 8px; background: transparent; font-weight: 600; font-size: 14.5px; color: var(--ink-2); }
+.seg-ctl button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+.switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.switch { position: relative; width: 50px; height: 30px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.switch span { position: absolute; inset: 0; border-radius: 15px; background: var(--line-strong); transition: background .15s; pointer-events: none; }
+.switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); }
+.switch input:checked + span { background: var(--blue); }
+.switch input:checked + span::after { transform: translateX(20px); }
+.switch input:focus-visible + span { outline: 2.5px solid var(--blue); outline-offset: 2px; }
+
+/* Réglages */
+.group { margin: 0 0 26px; }
+.group > p { margin: -4px 0 12px; color: var(--muted); font-size: 14.5px; max-width: 62ch; }
+.group-body { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.group-body > .field, .group-body > .kw-editor { padding: 14px 16px; border-top: 1px solid var(--line); }
+.group-body > :first-child { border-top: 0; }
+@media (min-width: 640px) {
+  .group-body > .field.row { grid-template-columns: minmax(0, 1fr) 200px; column-gap: 20px; align-items: center; }
+  .group-body > .field.row > .ctl { grid-column: 2; grid-row: 1 / span 3; }
+}
+.tag.confirm { background: var(--prio-soft); color: var(--ink); height: 20px; font-size: 12px; }
+.kw-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; list-style: none; padding: 0; }
+.kw-list li { display: inline-flex; align-items: center; gap: 2px; padding: 0 2px 0 11px; min-height: 34px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: 14.5px; font-weight: 500; }
+.kw-list button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--muted); }
+.kw-list button:hover { background: var(--line); color: var(--ink); }
+.kw-list svg { width: 14px; height: 14px; }
+.kw-add { display: flex; gap: 8px; }
+.savebar {
+  position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 10px); z-index: 5;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+  padding: 12px 14px; border-radius: 14px; background: var(--ink); color: var(--surface);
+  box-shadow: 0 10px 30px rgba(12, 18, 32, .22);
+}
+.savebar .txt { flex: 1 1 200px; font-size: 14.5px; line-height: 1.35; }
+.savebar .txt b { font-family: var(--font-num); font-size: 16px; }
+.savebar .btn-primary { background: var(--prio); color: #231A00; }
+.savebar .btn-quiet { color: var(--surface); opacity: .85; }
+@media (min-width: 960px) { .savebar { bottom: 16px; } }
+
+/* Évaluer */
+.eval-layout { display: grid; gap: 20px; }
+@media (min-width: 1180px) {
+  main.wide { max-width: 1120px; }
+  .eval-layout { grid-template-columns: minmax(0, 1fr) 400px; align-items: start; }
+  .eval-result { position: sticky; top: 24px; }
+  .peek { display: none !important; }
+}
+.peek {
+  position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 10px); z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px;
+  padding: 10px 10px 10px 16px; border-radius: 14px; background: var(--ink); color: var(--surface);
+  box-shadow: 0 10px 30px rgba(12, 18, 32, .22);
+}
+.peek .v { font: 700 21px var(--font-num); }
+.peek .v.gain { color: #5BE0A8; }
+.peek .l { font-size: 13px; opacity: .8; }
+.peek .btn { background: color-mix(in srgb, var(--surface) 14%, transparent); color: var(--surface); }
+@media (min-width: 960px) { .peek { bottom: 16px; } }
+
+/* Suivi */
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.kpi .v { font: 700 26px/1.05 var(--font-num); display: block; }
+.kpi .l { font-size: 13.5px; color: var(--muted); display: block; margin-top: 4px; }
+.funnel { display: grid; gap: 9px; }
+.fn-row { display: grid; grid-template-columns: minmax(118px, 36%) minmax(0, 1fr); gap: 12px; align-items: center; }
+.fn-lab { font-size: 14px; color: var(--ink-2); }
+.fn-track { display: flex; align-items: center; gap: 8px; }
+.fn-bar { height: 20px; border-radius: 4px; background: var(--bar-fees); min-width: 3px; }
+.fn-bar.alert { background: var(--prio); }
+.fn-bar.gain { background: var(--gain-bar); }
+.fn-val { font: 600 15px var(--font-num); white-space: nowrap; }
+.fn-val small { color: var(--muted); font-weight: 500; font-size: 13px; margin-left: 4px; }
+.buy-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.buy-table th { text-align: right; font-weight: 600; color: var(--muted); font-size: 12.5px; padding: 0 0 6px 8px; }
+.buy-table th:first-child, .buy-table td:first-child { text-align: left; padding-left: 0; }
+.buy-table td { text-align: right; padding: 9px 0 9px 8px; border-top: 1px solid var(--line); font-family: var(--font-num); font-size: 15px; }
+.buy-table td:first-child { font-family: var(--font); font-size: 14px; font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+
+/* Dialogue et toast */
+.dialog-wrap { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
+.dialog { width: min(420px, 100%); background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, .3); }
+.dialog h2 { margin-bottom: 6px; }
+.dialog p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; }
+.dialog .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 14px); z-index: 70;
+  transform: translate(-50%, 16px); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
+  display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 16px; border-radius: 12px;
+  background: var(--ink); color: var(--surface); font-size: 14.5px; font-weight: 500; max-width: calc(100vw - 32px);
+  box-shadow: 0 10px 30px rgba(12, 18, 32, .25);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { border: 0; background: transparent; color: var(--prio); font-weight: 700; padding: 6px 8px; border-radius: 8px; }
+@media (min-width: 960px) { .toast { bottom: 24px; left: calc(50% + 118px); } }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+/* Silhouettes */
+.car-body { stroke: var(--ink); stroke-opacity: .35; stroke-width: 1; }
+.car-glass { fill: var(--glass); }
+.car-tyre { fill: var(--tyre); }
+.car-hub { fill: var(--hub); }
+
+/* ---------- Version connectée ---------- */
+.card-top { grid-template-columns: auto minmax(0, 1fr) auto; }
+.thumb { width: 76px; height: 57px; border-radius: 8px; object-fit: cover; background: var(--surface-2); display: block; }
+.hero-media { grid-column: 1 / -1; margin-bottom: 6px; }
+.hero-photo { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; display: block; background: var(--surface-2); }
+.err-list { margin: 6px 0 0; padding-left: 18px; }
+.err-list li + li { margin-top: 2px; }
+.ro-value { font: 600 16px var(--font-num); color: var(--ink); }
+@media (min-width: 640px) { .ro-value { text-align: right; } }
+.panel.busy { opacity: .6; transition: opacity .2s; }
+body.logged-out .topbar, body.logged-out .rail { display: none; }
+body.logged-out { padding-left: 0; }
+main.login { min-height: 100%; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; gap: 16px; }
+.login-card .brand { font-size: 22px; }
+.login-card .brand svg { width: 28px; height: 28px; }
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/opportunites"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="1" transform="rotate(45 10 10)" fill="#fff" stroke="#1B1B1B" stroke-width="1.1"/><rect x="6.2" y="6.2" width="7.6" height="7.6" transform="rotate(45 10 10)" fill="#F5B800"/></svg>Sourcing auto</a>
+  <span data-slot="base" class="base-slot" style="margin-left:auto"></span>
+</header>
+<nav class="rail" aria-label="Navigation principale">
+  <a class="brand" href="#/opportunites"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="1" transform="rotate(45 10 10)" fill="#fff" stroke="#1B1B1B" stroke-width="1.1"/><rect x="6.2" y="6.2" width="7.6" height="7.6" transform="rotate(45 10 10)" fill="#F5B800"/></svg>Sourcing auto</a>
+  <div class="nav">
+    <a href="#/opportunites" data-view="opportunites"><span id="ico-opps"></span>Opportunités<span class="badge" id="nav-badge" hidden></span></a>
+    <a href="#/evaluer" data-view="evaluer"><span id="ico-calc"></span>Évaluer</a>
+    <a href="#/annonces" data-view="annonces"><span id="ico-list"></span>Annonces</a>
+    <a href="#/suivi" data-view="suivi"><span id="ico-chart"></span>Suivi</a>
+    <a href="#/reglages" data-view="reglages"><span id="ico-sliders"></span>Réglages</a>
+  </div>
+  <div class="rail-foot"><div data-slot="base"></div><div id="mode-line"></div></div>
+</nav>
+<main id="view"></main>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-head"></div>
+  <div class="sheet-body"></div>
+  <div class="sheet-foot"></div>
+</div>
+<div class="dialog-wrap" id="dialog" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+/* ============================================================
+   Utilitaires côté navigateur : formats, géographie, libellés des réglages
+   ============================================================ */
+const DAY = 86400000;
+const NOW = Date.now();
+const YEAR = new Date(NOW).getFullYear();
+
+const _nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+// Espace insécable standard : l'espace fine est presque invisible dans certaines polices
+const nf0 = { format: v => _nf0.format(v).replace(/\u202f/g, '\u00a0') };
+const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const nf2 = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NB = '\u00a0';
+
+function fmtEur(v) { return v == null || !isFinite(v) ? '—' : nf0.format(Math.round(v)) + NB + '€'; }
+function fmtSigned(v) {
+  if (v == null || !isFinite(v)) return '—';
+  const r = Math.round(v);
+  return (r > 0 ? '+' : r < 0 ? '−' : '') + nf0.format(Math.abs(r)) + NB + '€';
+}
+function fmtNum(v) { return v == null || !isFinite(v) ? '—' : nf0.format(Math.round(v)); }
+function fmtKm(v) { return v == null || !isFinite(v) ? '—' : nf0.format(Math.round(v)) + NB + 'km'; }
+function fmtPct(v, d = 1) { return v == null || !isFinite(v) ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: d }).format(v) + NB + '%'; }
+
+function strip(s) { return String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+function median(a) {
+  if (!a.length) return null;
+  const s = [...a].sort((x, y) => x - y);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+function haversine(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function pickW(rng, entries) {
+  const tot = entries.reduce((s, e) => s + e[1], 0);
+  let r = rng() * tot;
+  for (const e of entries) { r -= e[1]; if (r <= 0) return e[0]; }
+  return entries[entries.length - 1][0];
+}
+function normal(rng, mu, sd) {
+  const u = 1 - rng(), v = rng();
+  return mu + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function parseNumberFr(s) {
+  if (typeof s === 'number') return s;
+  const t = String(s ?? '').trim().replace(/[\s\u00a0\u202f]/g, '').replace(',', '.');
+  if (!/^-?\d+(\.\d+)?$/.test(t)) return NaN;
+  return parseFloat(t);
+}
+
+/* ---------- Géographie (remplace l'API Adresse côté interface) ---------- */
+// Préfecture de chaque département : [lat, lon, ville]
+const DEPTS = {
+  '01': [46.205, 5.225, 'Bourg-en-Bresse'], '02': [49.564, 3.620, 'Laon'], '03': [46.566, 3.333, 'Moulins'],
+  '04': [44.092, 6.236, 'Digne-les-Bains'], '05': [44.559, 6.079, 'Gap'], '06': [43.703, 7.266, 'Nice'],
+  '07': [44.735, 4.599, 'Privas'], '08': [49.773, 4.720, 'Charleville-Mézières'], '09': [42.965, 1.607, 'Foix'],
+  '10': [48.297, 4.074, 'Troyes'], '11': [43.212, 2.353, 'Carcassonne'], '12': [44.350, 2.575, 'Rodez'],
+  '13': [43.296, 5.370, 'Marseille'], '14': [49.183, -0.371, 'Caen'], '15': [44.926, 2.440, 'Aurillac'],
+  '16': [45.648, 0.156, 'Angoulême'], '17': [46.160, -1.151, 'La Rochelle'], '18': [47.081, 2.399, 'Bourges'],
+  '19': [45.267, 1.771, 'Tulle'], '2A': [41.919, 8.738, 'Ajaccio'], '2B': [42.697, 9.450, 'Bastia'],
+  '21': [47.322, 5.041, 'Dijon'], '22': [48.514, -2.765, 'Saint-Brieuc'], '23': [46.171, 1.871, 'Guéret'],
+  '24': [45.184, 0.721, 'Périgueux'], '25': [47.238, 6.024, 'Besançon'], '26': [44.933, 4.892, 'Valence'],
+  '27': [49.024, 1.151, 'Évreux'], '28': [48.446, 1.489, 'Chartres'], '29': [47.996, -4.102, 'Quimper'],
+  '30': [43.837, 4.360, 'Nîmes'], '31': [43.605, 1.444, 'Toulouse'], '32': [43.646, 0.586, 'Auch'],
+  '33': [44.838, -0.579, 'Bordeaux'], '34': [43.611, 3.877, 'Montpellier'], '35': [48.117, -1.678, 'Rennes'],
+  '36': [46.811, 1.691, 'Châteauroux'], '37': [47.394, 0.685, 'Tours'], '38': [45.188, 5.724, 'Grenoble'],
+  '39': [46.675, 5.555, 'Lons-le-Saunier'], '40': [43.890, -0.500, 'Mont-de-Marsan'], '41': [47.586, 1.336, 'Blois'],
+  '42': [45.440, 4.387, 'Saint-Étienne'], '43': [45.043, 3.885, 'Le Puy-en-Velay'], '44': [47.218, -1.554, 'Nantes'],
+  '45': [47.903, 1.909, 'Orléans'], '46': [44.448, 1.441, 'Cahors'], '47': [44.203, 0.616, 'Agen'],
+  '48': [44.518, 3.500, 'Mende'], '49': [47.478, -0.563, 'Angers'], '50': [49.116, -1.090, 'Saint-Lô'],
+  '51': [48.957, 4.365, 'Châlons-en-Champagne'], '52': [48.111, 5.139, 'Chaumont'], '53': [48.073, -0.770, 'Laval'],
+  '54': [48.692, 6.184, 'Nancy'], '55': [48.772, 5.160, 'Bar-le-Duc'], '56': [47.658, -2.760, 'Vannes'],
+  '57': [49.120, 6.176, 'Metz'], '58': [46.990, 3.159, 'Nevers'], '59': [50.629, 3.057, 'Lille'],
+  '60': [49.430, 2.081, 'Beauvais'], '61': [48.432, 0.091, 'Alençon'], '62': [50.291, 2.777, 'Arras'],
+  '63': [45.778, 3.087, 'Clermont-Ferrand'], '64': [43.295, -0.370, 'Pau'], '65': [43.233, 0.078, 'Tarbes'],
+  '66': [42.699, 2.895, 'Perpignan'], '67': [48.573, 7.752, 'Strasbourg'], '68': [48.079, 7.358, 'Colmar'],
+  '69': [45.764, 4.836, 'Lyon'], '70': [47.619, 6.155, 'Vesoul'], '71': [46.307, 4.828, 'Mâcon'],
+  '72': [48.006, 0.199, 'Le Mans'], '73': [45.564, 5.918, 'Chambéry'], '74': [45.899, 6.129, 'Annecy'],
+  '75': [48.857, 2.352, 'Paris'], '76': [49.443, 1.099, 'Rouen'], '77': [48.540, 2.660, 'Melun'],
+  '78': [48.804, 2.130, 'Versailles'], '79': [46.323, -0.465, 'Niort'], '80': [49.894, 2.296, 'Amiens'],
+  '81': [43.929, 2.148, 'Albi'], '82': [44.018, 1.355, 'Montauban'], '83': [43.124, 5.928, 'Toulon'],
+  '84': [43.949, 4.806, 'Avignon'], '85': [46.670, -1.426, 'La Roche-sur-Yon'], '86': [46.580, 0.340, 'Poitiers'],
+  '87': [45.834, 1.261, 'Limoges'], '88': [48.172, 6.449, 'Épinal'], '89': [47.798, 3.567, 'Auxerre'],
+  '90': [47.638, 6.863, 'Belfort'], '91': [48.629, 2.441, 'Évry'], '92': [48.892, 2.207, 'Nanterre'],
+  '93': [48.908, 2.440, 'Bobigny'], '94': [48.790, 2.455, 'Créteil'], '95': [49.036, 2.063, 'Cergy'],
+};
+// [ville, code postal, lat, lon, poids dans les données de démo]
+const CITIES = [
+  ['Paris', '75011', 48.859, 2.379, 10], ['Marseille', '13005', 43.293, 5.395, 6], ['Lyon', '69003', 45.759, 4.861, 6],
+  ['Toulouse', '31000', 43.605, 1.444, 5], ['Nice', '06000', 43.703, 7.266, 3], ['Nantes', '44000', 47.218, -1.554, 4],
+  ['Montpellier', '34000', 43.611, 3.877, 3], ['Strasbourg', '67000', 48.573, 7.752, 3], ['Bordeaux', '33000', 44.838, -0.579, 4],
+  ['Lille', '59000', 50.629, 3.057, 4], ['Rennes', '35000', 48.117, -1.678, 3], ['Reims', '51100', 49.258, 4.032, 2],
+  ['Toulon', '83000', 43.124, 5.928, 2], ['Saint-Étienne', '42000', 45.440, 4.387, 2], ['Le Havre', '76600', 49.494, 0.107, 2],
+  ['Grenoble', '38000', 45.188, 5.724, 2], ['Dijon', '21000', 47.322, 5.041, 2], ['Angers', '49000', 47.478, -0.563, 2],
+  ['Nîmes', '30000', 43.837, 4.360, 2], ['Clermont-Ferrand', '63000', 45.778, 3.087, 2], ['Le Mans', '72000', 48.006, 0.199, 2],
+  ['Aix-en-Provence', '13100', 43.529, 5.447, 2], ['Brest', '29200', 48.390, -4.486, 2], ['Tours', '37000', 47.394, 0.685, 2],
+  ['Amiens', '80000', 49.894, 2.296, 2], ['Limoges', '87000', 45.834, 1.261, 1.5], ['Perpignan', '66000', 42.699, 2.895, 1.5],
+  ['Metz', '57000', 49.120, 6.176, 1.5], ['Besançon', '25000', 47.238, 6.024, 1.5], ['Orléans', '45000', 47.903, 1.909, 1.5],
+  ['Rouen', '76000', 49.443, 1.099, 1.5], ['Mulhouse', '68100', 47.750, 7.336, 1.5], ['Caen', '14000', 49.183, -0.371, 1.5],
+  ['Nancy', '54000', 48.692, 6.184, 1.5], ['Argenteuil', '95100', 48.947, 2.248, 1.5], ['Montreuil', '93100', 48.861, 2.443, 1.5],
+  ['Avignon', '84000', 43.949, 4.806, 1], ['Poitiers', '86000', 46.580, 0.340, 1], ['Pau', '64000', 43.295, -0.370, 1],
+  ['La Rochelle', '17000', 46.160, -1.151, 1], ['Valence', '26000', 44.933, 4.892, 1], ['Troyes', '10000', 48.297, 4.074, 1],
+  ['Chambéry', '73000', 45.564, 5.918, 1], ['Annecy', '74000', 45.899, 6.129, 1], ['Béziers', '34500', 43.344, 3.215, 1],
+  ['Bayonne', '64100', 43.493, -1.475, 1], ['Vannes', '56000', 47.658, -2.760, 1], ['Quimper', '29000', 47.996, -4.102, 1],
+  ['Chartres', '28000', 48.446, 1.489, 1], ['Bourges', '18000', 47.081, 2.399, 1], ['Colmar', '68000', 48.079, 7.358, 1],
+  ['Niort', '79000', 46.323, -0.465, 1], ['Ajaccio', '20000', 41.919, 8.738, 0.4], ['Évreux', '27000', 49.024, 1.151, 1],
+  ['Saint-Brieuc', '22000', 48.514, -2.765, 1], ['Périgueux', '24000', 45.184, 0.721, 1], ['Agen', '47000', 44.203, 0.616, 0.8],
+  ['Carcassonne', '11000', 43.212, 2.353, 0.8], ['Auxerre', '89000', 47.798, 3.567, 0.8], ['Charleville-Mézières', '08000', 49.773, 4.720, 0.7],
+];
+function deptOf(cp) {
+  if (!/^\d{5}$/.test(cp)) return null;
+  let d = cp.slice(0, 2);
+  if (d === '20') d = (+cp < 20200) ? '2A' : '2B';
+  return d;
+}
+function geocode(cp, ville) {
+  cp = String(cp ?? '').trim();
+  const v = ville ? strip(ville).trim() : '';
+  const exact = CITIES.find(c => c[1] === cp) || (v && CITIES.find(c => strip(c[0]) === v && deptOf(c[1]) === deptOf(cp)));
+  if (exact) return { lat: exact[2], lon: exact[3], approx: false, label: exact[0] };
+  const d = deptOf(cp);
+  if (d && DEPTS[d]) return { lat: DEPTS[d][0], lon: DEPTS[d][1], approx: true, label: DEPTS[d][2] };
+  return null;
+}
+
+const DEFAULT_PARAMS = {
+  prix_min_eur: 2000, prix_max_eur: 30000, km_max: 200000, km_par_an_max: 20000,
+  vendeur_particulier_uniquement: true, taux_frais_pct: 10, decote_negociation_pct: 6,
+  cout_transport_eur_km: 0.30, base_code_postal: '', marge_min_eur: 1000, marge_prioritaire_eur: 2000,
+  comparables_min: 5, fenetre_comparables_jours: 90, regime_fiscal: 'particulier',
+};
+const DEFAULT_KEYWORDS = ['accidenté', 'pour pièces', 'moteur HS', 'non roulant', 'sans CT', 'épave', 'sinistré', 'VEI', 'boîte HS', 'joint de culasse'];
+
+const PARAM_GROUPS = [
+  { id: 'filtres', title: 'Filtres des annonces', intro: 'Une annonce qui ne passe pas un filtre est enregistrée mais jamais alertée.', keys: ['prix_min_eur', 'prix_max_eur', 'km_max', 'km_par_an_max', 'vendeur_particulier_uniquement'] },
+  { id: 'marge', title: 'Calcul de la marge', intro: 'Marge = cote après décote − prix − frais − transport.', keys: ['taux_frais_pct', 'decote_negociation_pct', 'cout_transport_eur_km', 'base_code_postal', 'regime_fiscal'] },
+  { id: 'alertes', title: 'Seuils d’alerte', intro: null, keys: ['marge_min_eur', 'marge_prioritaire_eur'] },
+  { id: 'cote', title: 'Cote de marché', intro: 'La cote est la médiane des prix des annonces comparables : même marque, modèle, carburant et boîte, année ±1 et ±20 000 km.', keys: ['comparables_min', 'fenetre_comparables_jours'] },
+];
+const PARAM_META = {
+  prix_min_eur: { label: 'Prix minimum', unit: '€', kind: 'int', min: 0, max: 1000000 },
+  prix_max_eur: { label: 'Prix maximum', unit: '€', kind: 'int', min: 1, max: 1000000 },
+  km_max: { label: 'Kilométrage maximum', unit: 'km', kind: 'int', min: 1, max: 1000000 },
+  km_par_an_max: { label: 'Kilomètres par an maximum', unit: 'km/an', kind: 'int', min: 1, max: 200000, help: 'Calculé avec un âge minimum d’un an pour les véhicules récents.' },
+  vendeur_particulier_uniquement: { label: 'Particuliers uniquement', kind: 'bool', help: 'Les annonces de professionnels restent utilisées pour calculer la cote.' },
+  taux_frais_pct: { label: 'Frais par véhicule', unit: '% du prix', kind: 'dec', min: 0, max: 100, help: 'Remise en état, contrôle technique, carte grise : en pourcentage du prix d’achat.' },
+  decote_negociation_pct: { label: 'Décote de revente', unit: '%', kind: 'dec', min: 0, max: 100, help: 'Écart attendu entre le prix affiché des comparables et le prix de vente réel.' },
+  cout_transport_eur_km: { label: 'Coût du transport', unit: '€/km', kind: 'dec', min: 0, max: 10, help: 'Appliqué à la distance routière estimée (vol d’oiseau × 1,3).' },
+  base_code_postal: { label: 'Code postal de la base', kind: 'cp', help: 'Point d’arrivée des véhicules achetés.' },
+  regime_fiscal: { label: 'Régime fiscal', kind: 'select', options: [{ value: 'particulier', label: 'Particulier, sans TVA' }, { value: 'pro_tva_marge', label: 'Professionnel, TVA sur marge (bientôt)', disabled: true }] },
+  marge_min_eur: { label: 'Marge minimum pour alerter', unit: '€', kind: 'int', min: 0, max: 100000 },
+  marge_prioritaire_eur: { label: 'Marge d’une alerte prioritaire', unit: '€', kind: 'int', min: 0, max: 100000 },
+  comparables_min: { label: 'Comparables minimum', unit: 'annonces', kind: 'int', min: 1, max: 100, help: 'En dessous, les critères sont élargis une fois : année ±2 et ±40 000 km.' },
+  fenetre_comparables_jours: { label: 'Période des comparables', unit: 'jours', kind: 'int', min: 7, max: 365 },
+};
+
+const MOTIFS = {
+  prix_hors_bornes: 'Prix hors fourchette',
+  vendeur_pro: 'Vendeur professionnel',
+  km_max: 'Kilométrage trop élevé',
+  km_par_an: 'Trop de kilomètres par an',
+  mot_cle: 'Mot-clé d’exclusion',
+  donnees_incompletes: 'Données incomplètes',
+  cote_indisponible: 'Aucun comparable',
+};
+
+function kwRegex(kw) {
+  const k = strip(kw).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return new RegExp('(^|[^\\p{L}\\p{N}])(' + k + ')(?=$|[^\\p{L}\\p{N}])', 'u');
+}
+// Texte normalisé + table de correspondance vers l'original (pour surligner)
+function normMap(text) {
+  let out = ''; const map = [];
+  for (let i = 0; i < text.length; i++) {
+    const n = strip(text[i]);
+    for (const ch of n) { out += ch; map.push(i); }
+  }
+  return { out, map };
+}
+
+function keywordRanges(text, kwList) {
+  const { out, map } = normMap(text);
+  const ranges = [];
+  for (const { re } of kwList) {
+    const g = new RegExp(re.source, 'gu');
+    let m;
+    while ((m = g.exec(out))) {
+      const start = m.index + m[1].length, end = start + m[2].length;
+      ranges.push([map[start], map[end - 1] + 1]);
+      g.lastIndex = end;
+    }
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  return ranges;
+}
+
+const MODELS = [
+  { marque: 'Renault', modele: 'Clio', body: 'citadine', base: 19500, dep: .11, w: 10, auto: .1, v: { Essence: ['1.0 TCe 90 Zen', '0.9 TCe 75 Limited', '1.2 16V 75 Trend'], Diesel: ['1.5 dCi 90 Business', '1.5 Blue dCi 85 Intens'], Hybride: ['E-Tech 140 Intens'] }, f: { Essence: .6, Diesel: .33, Hybride: .07 } },
+  { marque: 'Peugeot', modele: '208', body: 'citadine', base: 20000, dep: .11, w: 10, auto: .15, v: { Essence: ['1.2 PureTech 100 Allure', '1.2 PureTech 82 Like', '1.2 PureTech 75 Active'], Diesel: ['1.5 BlueHDi 100 Active', '1.6 BlueHDi 75 Access'], 'Électrique': ['e-208 136 GT'] }, f: { Essence: .64, Diesel: .3, 'Électrique': .06 } },
+  { marque: 'Peugeot', modele: '308', body: 'compacte', base: 27000, dep: .12, w: 7, auto: .3, v: { Essence: ['1.2 PureTech 130 Allure', '1.2 PureTech 110 Active'], Diesel: ['1.5 BlueHDi 130 GT Line', '1.6 BlueHDi 120 Allure'] }, f: { Essence: .5, Diesel: .5 } },
+  { marque: 'Peugeot', modele: '3008', body: 'suv', base: 33000, dep: .12, w: 6, auto: .4, v: { Diesel: ['1.5 BlueHDi 130 Allure', '2.0 BlueHDi 180 GT'], Essence: ['1.2 PureTech 130 GT Line'], Hybride: ['Hybrid 225 GT'] }, f: { Diesel: .6, Essence: .34, Hybride: .06 } },
+  { marque: 'Volkswagen', modele: 'Golf', body: 'compacte', base: 28000, dep: .11, w: 7, auto: .3, v: { Essence: ['1.0 TSI 110 Life', '1.5 TSI 130 Style', 'GTI 245'], Diesel: ['2.0 TDI 150 Style', '1.6 TDI 115 Confortline'] }, f: { Essence: .5, Diesel: .5 } },
+  { marque: 'Volkswagen', modele: 'Polo', body: 'citadine', base: 20000, dep: .11, w: 6, auto: .15, v: { Essence: ['1.0 TSI 95 Life', '1.0 MPI 80 Trendline'], Diesel: ['1.6 TDI 95 Confortline'] }, f: { Essence: .72, Diesel: .28 } },
+  { marque: 'Toyota', modele: 'Yaris', body: 'citadine', base: 21000, dep: .09, w: 6, auto: .5, v: { Hybride: ['Hybride 116h Design', 'Hybride 100h Dynamic'], Essence: ['1.0 VVT-i 72 France', '1.5 VVT-i 125 Collection'] }, f: { Hybride: .75, Essence: .25 } },
+  { marque: 'Dacia', modele: 'Sandero', body: 'citadine', base: 14000, dep: .10, w: 7, auto: .03, v: { Essence: ['TCe 90 Stepway', 'SCe 75 Essentiel'], GPL: ['ECO-G 100 Confort', 'TCe 100 Bi-Fuel Stepway'], Diesel: ['dCi 75 Ambiance'] }, f: { Essence: .6, GPL: .3, Diesel: .1 } },
+  { marque: 'Citroën', modele: 'C3', body: 'citadine', base: 18000, dep: .12, w: 6, auto: .08, v: { Essence: ['PureTech 83 Feel', 'PureTech 110 Shine'], Diesel: ['BlueHDi 100 Shine', 'BlueHDi 75 Feel'] }, f: { Essence: .6, Diesel: .4 } },
+  { marque: 'Renault', modele: 'Captur', body: 'suv', base: 24000, dep: .11, w: 6, auto: .25, v: { Essence: ['TCe 90 Zen', 'TCe 130 Intens'], Diesel: ['dCi 90 Business', 'Blue dCi 115 Intens'], Hybride: ['E-Tech 145 Techno'] }, f: { Essence: .58, Diesel: .32, Hybride: .1 } },
+  { marque: 'Renault', modele: 'Mégane', body: 'compacte', base: 26000, dep: .13, w: 5, auto: .25, v: { Diesel: ['1.5 dCi 110 Intens', '1.5 Blue dCi 115 Business'], Essence: ['1.3 TCe 140 Zen', '1.2 TCe 130 Bose'] }, f: { Diesel: .55, Essence: .45 } },
+  { marque: 'Renault', modele: 'Zoe', body: 'citadine', base: 30000, dep: .16, w: 3, v: { 'Électrique': ['R110 Zen', 'R135 Intens', 'Life R90'] }, f: { 'Électrique': 1 } },
+  { marque: 'Ford', modele: 'Fiesta', body: 'citadine', base: 18000, dep: .13, w: 4, auto: .1, v: { Essence: ['1.0 EcoBoost 100 Titanium', '1.1 75 Trend'], Diesel: ['1.5 TDCi 85 Business'] }, f: { Essence: .7, Diesel: .3 } },
+  { marque: 'Opel', modele: 'Corsa', body: 'citadine', base: 18500, dep: .13, w: 4, auto: .1, v: { Essence: ['1.2 75 Edition', '1.2 Turbo 100 Elegance'], Diesel: ['1.5 D 100 GS Line'] }, f: { Essence: .7, Diesel: .3 } },
+  { marque: 'Skoda', modele: 'Octavia', body: 'berline', base: 28000, dep: .11, w: 4, auto: .45, v: { Diesel: ['2.0 TDI 150 Style', '1.6 TDI 115 Ambition'], Essence: ['1.5 TSI 150 Business'] }, f: { Diesel: .6, Essence: .4 } },
+  { marque: 'BMW', modele: 'Série 1', body: 'compacte', base: 32000, dep: .12, w: 4, auto: .6, v: { Diesel: ['116d Lounge', '118d Business Design'], Essence: ['118i M Sport', '116i Edition'] }, f: { Diesel: .55, Essence: .45 } },
+  { marque: 'Audi', modele: 'A3', body: 'compacte', base: 33000, dep: .11, w: 4, auto: .55, v: { Diesel: ['30 TDI 116 Design', '1.6 TDI 110 Ambiente'], Essence: ['35 TFSI 150 S line', '1.0 TFSI 116 Sport'] }, f: { Diesel: .55, Essence: .45 } },
+  { marque: 'Mercedes-Benz', modele: 'Classe A', body: 'compacte', base: 35000, dep: .12, w: 3, auto: .7, v: { Diesel: ['180 d Progressive', '180 d Business Line'], Essence: ['200 AMG Line', '160 Intuition'] }, f: { Diesel: .5, Essence: .5 } },
+  { marque: 'Tesla', modele: 'Model 3', body: 'berline', base: 48000, dep: .13, w: 2, yearMin: 2019, v: { 'Électrique': ['Standard Plus', 'Grande Autonomie AWD', 'Propulsion'] }, f: { 'Électrique': 1 } },
+  { marque: 'Dacia', modele: 'Duster', body: 'suv', base: 20000, dep: .10, w: 4, auto: .05, v: { Diesel: ['dCi 115 4x2 Prestige', 'Blue dCi 115 Journey'], Essence: ['TCe 130 Journey'], GPL: ['ECO-G 100 Confort'] }, f: { Diesel: .5, Essence: .3, GPL: .2 } },
+  { marque: 'Fiat', modele: '500', body: 'citadine', base: 16500, dep: .12, w: 4, auto: .1, v: { Essence: ['1.2 69 Lounge', '0.9 TwinAir Pop'], Hybride: ['1.0 Hybrid Dolcevita'] }, f: { Essence: .88, Hybride: .12 } },
+  { marque: 'Toyota', modele: 'C-HR', body: 'suv', base: 31000, dep: .10, w: 3, yearMin: 2017, v: { Hybride: ['122h Distinctive', '184h GR Sport', '122h Dynamic'] }, f: { Hybride: 1 } },
+  { marque: 'Renault', modele: 'Kangoo', body: 'utilitaire', base: 23000, dep: .10, w: 3, auto: .02, v: { Diesel: ['1.5 dCi 90 Grand Confort', 'Blue dCi 95 Extra'], 'Électrique': ['Z.E. 33 Grand Confort'] }, f: { Diesel: .9, 'Électrique': .1 } },
+  { marque: 'Peugeot', modele: 'Partner', body: 'utilitaire', base: 23000, dep: .11, w: 2, auto: .02, v: { Diesel: ['1.6 BlueHDi 100 Premium', '1.5 BlueHDi 100 Asphalt'] }, f: { Diesel: 1 } },
+  { marque: 'Kia', modele: 'Sportage', body: 'suv', base: 31000, dep: .11, w: 3, auto: .4, v: { Diesel: ['1.6 CRDi 136 Active', '1.7 CRDi 115 Motion'], Essence: ['1.6 T-GDi 150 Design'], Hybride: ['1.6 T-GDi 230 HEV GT-Line'] }, f: { Diesel: .5, Essence: .3, Hybride: .2 } },
+  { marque: 'Mini', modele: 'Cooper', body: 'citadine', base: 26000, dep: .10, w: 1, auto: .4, v: { Essence: ['136 ch Edition', 'S 178 ch Chili'], Diesel: ['D 116 ch Business'] }, f: { Essence: .8, Diesel: .2 } },
+  { marque: 'Alfa Romeo', modele: 'Giulietta', body: 'compacte', base: 28000, dep: .14, w: .6, auto: .3, yearMax: 2020, v: { Diesel: ['2.0 JTDm 150 Super'], Essence: ['1.4 TB 120 Distinctive'] }, f: { Diesel: .6, Essence: .4 } },
+];
+
+function bodyFor(marque, modele) {
+  const m = MODELS.find(x => strip(x.marque) === strip(marque).trim() && strip(x.modele) === strip(modele).trim());
+  return m ? m.body : 'compacte';
+}
+
+function defaultConfig() {
+  return { params: { ...DEFAULT_PARAMS }, keywords: [...DEFAULT_KEYWORDS], version: '—' };
+}
+function kwList(keywords) { return keywords.map(kw => ({ kw, re: kwRegex(kw) })); }
+
+/* ============================================================
+   Interface : socle
+   ============================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const plural = (n, one, many) => n > 1 ? many : one;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const dtf = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+function ago(ts) {
+  const d = Date.now() - ts;
+  if (d < 60000) return 'à l’instant';
+  if (d < 3600000) return `il y a ${Math.round(d / 60000)} min`;
+  if (d < 86400000) return `il y a ${Math.round(d / 3600000)} h`;
+  const j = Math.round(d / 86400000);
+  return j === 1 ? 'hier' : `il y a ${j} jours`;
+}
+const SOURCES = { leboncoin: 'Leboncoin', lacentrale: 'La Centrale', autre: 'Autre site' };
+
+const I = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
+const ICON = {
+  opps: I('<path d="M12 2.8 21.2 12 12 21.2 2.8 12Z"/><path d="M12 7.6 16.4 12 12 16.4 7.6 12Z"/>'),
+  calc: I('<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7"/><path d="M8.6 12h.01M12 12h.01M15.4 12h.01M8.6 15.8h.01M12 15.8h.01M15.4 15.8h.01" stroke-width="2.4"/>'),
+  list: I('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="2.6"/>'),
+  chart: I('<path d="M4 4v16h16"/><path d="M8.5 16v-4M12.5 16V8M16.5 16v-6"/>'),
+  sliders: I('<path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.2"/><circle cx="9.5" cy="17" r="2.2"/>'),
+  up: I('<path d="M7 10.5V20H4.2V10.5Z"/><path d="M7 10.5 10.8 3.6c1.6 0 2.5 1.1 2.2 2.7l-.6 3.2h5.4a2 2 0 0 1 2 2.3l-1.1 6.4a2 2 0 0 1-2 1.8H7"/>'),
+  x: I('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
+  key: I('<circle cx="8" cy="15.5" r="4"/><path d="M10.9 12.6 19 4.5M16 7.5l2.2 2.2M13.6 9.9l2 2"/>'),
+  pin: I('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>'),
+  clock: I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+  ext: I('<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
+  chev: I('<path d="M6 9l6 6 6-6"/>'),
+  back: I('<path d="M15 5l-7 7 7 7"/>'),
+  info: I('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8h.01" stroke-width="2.2"/>'),
+  warn: I('<path d="M12 3.5 21.5 20h-19Z"/><path d="M12 10v4.5M12 17.2h.01" stroke-width="2.2"/>'),
+  search: I('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>'),
+  plus: I('<path d="M12 5v14M5 12h14"/>'),
+  home: I('<path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/>'),
+  down: I('<path d="M12 5v14M6.5 13.5 12 19l5.5-5.5"/>'),
+  check: I('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+  stop: I('<circle cx="12" cy="12" r="9"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/>'),
+};
+// Panneau « route à caractère prioritaire » : le repère des alertes prioritaires
+const DIAMOND = (size = 16) => `<svg viewBox="0 0 20 20" width="${size}" height="${size}" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="1" transform="rotate(45 10 10)" fill="#fff" stroke="#1B1B1B" stroke-width="1.1"/><rect x="6.2" y="6.2" width="7.6" height="7.6" transform="rotate(45 10 10)" fill="#F5B800"/></svg>`;
+
+const CAR_COLORS = { Blanc: '#F3F5F8', Gris: '#9AA3AF', Noir: '#2B303A', Bleu: '#2F5DA8', Rouge: '#B8352C', Beige: '#CDBB98' };
+const CAR_SHAPES = {
+  citadine: { d: 'M9 40 L8 33 Q8 29 13 28 L33 25.5 L45 15.5 Q47.5 13.5 51 13.5 L84 13.5 Q88 13.5 90 16.5 L99 27 Q104 28.5 104 32 L104 38 Q104 40 102 40 L95 40 A9 9 0 0 0 77 40 L40 40 A9 9 0 0 0 22 40 Z', g: ['M47.5 16.5 Q49 15.5 51.5 15.5 L64 15.5 L64 25 L36.5 25.3 Z', 'M67 15.5 L84 15.5 Q87 15.5 88.5 18 L94 25 L67 25 Z'], w: [[31, 40, 7], [86, 40, 7]] },
+  compacte: { d: 'M8 40 L7 33 Q7 29 12 28 L34 25.5 L47 15 Q49.5 13 53 13 L90 13 Q94 13 96 16 L105 27 Q111 28.5 111 32 L111 38 Q111 40 109 40 L102 40 A9 9 0 0 0 84 40 L40 40 A9 9 0 0 0 22 40 Z', g: ['M49.5 16 Q51 15 53.5 15 L68 15 L68 25 L37.5 25.3 Z', 'M71 15 L90 15 Q93 15 94.5 17.5 L100 25 L71 25 Z'], w: [[31, 40, 7], [93, 40, 7]] },
+  berline: { d: 'M7 40 L6 33 Q6 29 11 28 L32 25.5 L44 16 Q46.5 14 50 14 L76 14 Q80 14 82.5 16.5 L90 24.5 L106 26 Q111 27 111 31 L111 38 Q111 40 109 40 L100 40 A9 9 0 0 0 82 40 L39 40 A9 9 0 0 0 21 40 Z', g: ['M46 17 Q47.5 16 50.5 16 L62 16 L62 25 L35.5 25.3 Z', 'M65 16 L76 16 Q79 16 80.5 17.5 L87 25 L65 25 Z'], w: [[30, 40, 7], [91, 40, 7]] },
+  suv: { d: 'M8 40 L7 31 Q7 26 12 25.5 L32 23.5 L42 12 Q44 10 48 10 L88 10 Q92 10 94 13 L101 23 Q106 24 106 28 L106 38 Q106 40 104 40 L97 40 A10 10 0 0 0 77 40 L41 40 A10 10 0 0 0 21 40 Z', g: ['M44 13 Q45.5 12 48.5 12 L64 12 L64 22.5 L35 22.8 Z', 'M67 12 L88 12 Q90.5 12 92 14.5 L97 22.5 L67 22.5 Z'], w: [[31, 40, 8], [87, 40, 8]] },
+  utilitaire: { d: 'M8 40 L7 30 Q7 25 12 24 L26 22 L36 9 Q38 7 42 7 L102 7 Q106 7 106 11 L106 38 Q106 40 104 40 L97 40 A9 9 0 0 0 79 40 L40 40 A9 9 0 0 0 22 40 Z', g: ['M38 10 Q39.5 9 42 9 L54 9 L54 21 L29.5 21.5 Z'], w: [[31, 40, 7], [88, 40, 7]] },
+};
+function carSVG(l) {
+  const s = CAR_SHAPES[l.body] || CAR_SHAPES.compacte;
+  const fill = CAR_COLORS[l.couleur] || CAR_COLORS.Gris;
+  return `<svg viewBox="0 0 120 50" aria-hidden="true"><path class="car-body" d="${s.d}" fill="${fill}"/>${s.g.map(g => `<path class="car-glass" d="${g}"/>`).join('')}${s.w.map(([x, y, r]) => `<circle class="car-tyre" cx="${x}" cy="${y}" r="${r}"/><circle class="car-hub" cx="${x}" cy="${y}" r="${(r * .42).toFixed(1)}"/>`).join('')}</svg>`;
+}
+
+/* ---------- API du service ---------- */
+class ApiError extends Error {
+  constructor(status, message) { super(message); this.status = status; }
+}
+function detailText(d) {
+  if (!d) return 'Erreur inattendue du serveur.';
+  if (typeof d === 'string') return d;
+  if (Array.isArray(d.errors)) return d.errors.join(' ; ');
+  if (Array.isArray(d)) return d.map(x => x.msg || String(x)).join(' ; ');
+  return JSON.stringify(d);
+}
+const Api = {
+  async req(path, opts = {}) {
+    let res;
+    try {
+      res = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
+    } catch (e) {
+      throw new ApiError(0, 'Connexion au serveur impossible. Vérifiez votre réseau.');
+    }
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401 && path !== '/api/login') { showLogin(); throw new ApiError(401, 'Connexion requise.'); }
+    if (!res.ok) throw new ApiError(res.status, detailText(data.detail));
+    return data;
+  },
+  get(path) { return this.req(path); },
+  post(path, body) { return this.req(path, { method: 'POST', body: JSON.stringify(body) }); },
+};
+
+/* ---------- État ---------- */
+const Store = { feedback: {}, sheetUrl: null };
+const S = {
+  feedItems: [], byId: new Map(), evals: new Map(), detail: {}, cfgUsed: defaultConfig(), cfgErrors: null,
+  ctx: { kwList: kwList(DEFAULT_KEYWORDS) }, loaded: false, loadError: null,
+  view: null, sheetId: null, sheetFromApp: false, lastFocus: null,
+  feed: { status: 'todo', period: 7, prioOnly: false, sort: 'marge' },
+  list: { q: '', statut: 'all', offset: 0, items: [], counts: {}, total: 0, loading: false, error: null },
+  stats: null, statsError: null, ev: null,
+};
+const EMPTY_EV = { statut: 'non_evaluee', n: 0, comps: [], motif: null, niveau: null, cote: null, marge: null };
+
+function ingest(items) {
+  for (const it of items) {
+    it.body = bodyFor(it.marque, it.modele);
+    it.couleur = 'Gris';
+    S.byId.set(it.id, it);
+    S.evals.set(it.id, it.ev ? { ...it.ev, comps: [] } : EMPTY_EV);
+    if (it.fb) Store.feedback[it.id] = it.fb; else delete Store.feedback[it.id];
+  }
+  return items;
+}
+async function loadConfig() {
+  const r = await Api.get('/api/config');
+  Store.sheetUrl = r.sheetUrl;
+  S.cfgErrors = r.errors && r.errors.length ? r.errors : null;
+  S.cfgUsed = r.config ? { params: r.config.params, keywords: r.config.keywords, version: r.config.version } : defaultConfig();
+  S.ctx = { kwList: kwList(S.cfgUsed.keywords) };
+}
+async function loadFeed() {
+  const r = await Api.get(`/api/opportunities?period=${S.feed.period === 1 ? 1 : Math.max(S.feed.period, 7)}`);
+  S.feedItems = ingest(r.items);
+}
+async function loadDetail(id) {
+  const d = await Api.get('/api/listing/' + encodeURIComponent(id));
+  ingest([d]);
+  S.detail[id] = d;
+  S.evals.set(id, { ...(d.ev || EMPTY_EV), comps: d.comps || [] });
+  return d;
+}
+function todoCount(period = 7) {
+  if (S.cfgErrors) return 0;
+  const since = Date.now() - period * DAY;
+  return S.feedItems.filter(l => S.evals.get(l.id).niveau && !Store.feedback[l.id] && l.first_seen_at >= since).length;
+}
+function emit() { refresh(); }
+
+/* ---------- Connexion ---------- */
+function showLogin(message) {
+  document.body.classList.add('logged-out');
+  $('#view').className = 'login';
+  $('#view').innerHTML = `<form class="login-card" id="login-form" onsubmit="return false">
+    <div class="brand">${DIAMOND(28)}Sourcing auto</div>
+    <div class="field"><label for="pwd">Mot de passe</label><input id="pwd" class="input" type="password" autocomplete="current-password" required></div>
+    <p class="err-msg" id="login-err"${message ? '' : ' hidden'}>${esc(message || '')}</p>
+    <button type="submit" class="btn btn-primary" data-action="login">Se connecter</button>
+  </form>`;
+  setTimeout(() => { const i = $('#pwd'); if (i) i.focus(); }, 30);
+}
+async function doLogin() {
+  const pwd = $('#pwd').value;
+  try {
+    await Api.post('/api/login', { password: pwd });
+    document.body.classList.remove('logged-out');
+    await boot();
+  } catch (e) {
+    const el = $('#login-err'); el.hidden = false; el.textContent = e.status === 401 ? 'Mot de passe incorrect.' : e.message;
+  }
+}
+async function boot() {
+  const s = await Api.get('/api/session').catch(() => ({ ok: false }));
+  if (!s.ok) { showLogin(); return; }
+  document.body.classList.remove('logged-out');
+  S.view = null;
+  $('#view').innerHTML = '<p class="muted" style="padding:40px 0">Chargement des annonces…</p>';
+  try {
+    await Promise.all([loadConfig(), loadFeed()]);
+    S.loaded = true; S.loadError = null;
+  } catch (e) {
+    if (e.status === 401) return;
+    S.loadError = e.message;
+  }
+  route();
+}
+
+/* ---------- Routage ---------- */
+function parseHash() {
+  const h = location.hash.replace(/^#\/?/, '');
+  const [a, ...rest] = h.split('/');
+  return { a: a || 'opportunites', b: rest.length ? decodeURIComponent(rest.join('/')) : null };
+}
+function route() {
+  if (document.body.classList.contains('logged-out')) return;
+  const { a, b } = parseHash();
+  if (a === 'annonce' && b) {
+    if (!S.view) show('opportunites');
+    openSheet(b);
+    return;
+  }
+  if (S.sheetId) closeSheetDom();
+  const v = VIEWS[a] ? a : 'opportunites';
+  if (v !== S.view) show(v);
+}
+function show(v) {
+  S.view = v;
+  renderView();
+  window.scrollTo(0, 0);
+}
+function renderView() {
+  const main = $('#view');
+  main.className = S.view === 'evaluer' ? 'wide' : '';
+  main.innerHTML = S.loadError && S.view === 'opportunites'
+    ? `<div class="note stop" style="margin-top:20px">${ICON.stop}<div class="note-body"><strong>Chargement impossible.</strong> ${esc(S.loadError)}<div class="note-actions"><button type="button" class="btn btn-ghost btn-sm" data-action="reload">Réessayer</button></div></div></div>`
+    : VIEWS[S.view].render();
+  if (VIEWS[S.view].after) VIEWS[S.view].after();
+  updateChrome();
+}
+function refresh() {
+  updateChrome();
+  if (!S.view) return;
+  if (S.view === 'evaluer') updateEvalResult();
+  else if (S.view === 'annonces') updateList();
+  else { const y = window.scrollY; renderView(); window.scrollTo(0, y); }
+  if (S.sheetId) renderSheet();
+}
+function updateChrome() {
+  const { a } = parseHash();
+  const cur = a === 'annonce' ? S.view : a;
+  document.querySelectorAll('.nav a').forEach(el => {
+    if (el.dataset.view === cur) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+  });
+  const n = todoCount(7);
+  const badge = $('#nav-badge');
+  badge.textContent = n > 99 ? '99+' : String(n);
+  badge.hidden = n === 0;
+  badge.setAttribute('aria-label', `${n} à traiter`);
+  const pill = basePill();
+  document.querySelectorAll('[data-slot="base"]').forEach(el => { el.innerHTML = pill; });
+  $('#mode-line').innerHTML = '<button type="button" class="btn btn-quiet btn-sm" style="padding:0" data-action="logout">Se déconnecter</button>';
+}
+function basePill() {
+  const cp = S.cfgUsed.params.base_code_postal;
+  if (!cp) return `<a class="base-pill missing" href="#/reglages">${ICON.home}Base à renseigner</a>`;
+  const g = geocode(cp);
+  return `<a class="base-pill" href="#/reglages" title="Voir les réglages">${ICON.home}${esc(g ? g.label : '')} ${esc(cp)}</a>`;
+}
+
+/* ---------- Toast et dialogue ---------- */
+let toastTimer = null, toastUndo = null;
+function toast(msg, undo) {
+  const t = $('#toast');
+  toastUndo = undo || null;
+  t.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button type="button" data-action="toast-undo">Annuler</button>' : ''}`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); toastUndo = null; }, undo ? 6000 : 3800);
+}
+function openDialog(html, onReady) {
+  const w = $('#dialog');
+  w.innerHTML = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">${html}</div>`;
+  w.hidden = false;
+  if (onReady) onReady(w);
+}
+function closeDialog() { const w = $('#dialog'); w.hidden = true; w.innerHTML = ''; }
+
+/* ============================================================
+   Opportunités et fiche détaillée
+   ============================================================ */
+const FB_LABELS = { interessant: 'Intéressant', pas_interessant: 'Pas intéressant', achete: 'Acheté' };
+const FB_ICONS = { interessant: ICON.up, pas_interessant: ICON.x, achete: ICON.key };
+const FIAB = {
+  fiable: { l: 3, label: 'Cote fiable' },
+  moyenne: { l: 2, label: 'Cote moyenne' },
+  faible: { l: 1, label: 'Cote peu fiable' },
+};
+const PERIODS = { 1: 'les dernières 24 heures', 7: 'les 7 derniers jours', 30: 'les 30 derniers jours' };
+
+function motifLabel(ev) {
+  if (!ev.motif) return ev.statut === 'sous_seuil' ? 'Sous le seuil' : '';
+  if (ev.motif.code === 'mot_cle') return `Mot-clé « ${ev.motif.detail} »`;
+  return MOTIFS[ev.motif.code] || ev.motif.code;
+}
+function signal(fiab) {
+  const f = FIAB[fiab];
+  return f ? `<span class="signal l${f.l}" aria-hidden="true"><i></i><i></i><i></i></span>` : '';
+}
+function place(l, ev) {
+  const where = l.ville ? `${esc(l.ville)}${l.cp ? ` (${esc(l.cp.slice(0, 2))})` : ''}` : 'Lieu inconnu';
+  return ev.distance != null ? `${where}, à ${fmtNum(ev.distance)}${NB}km` : where;
+}
+
+function splitBar(l, ev, lg) {
+  if (ev.cote == null || ev.marge == null) return '';
+  const parts = [['s-buy', l.prix, 'Prix d’achat'], ['s-fees', ev.frais, 'Frais'], ['s-transport', ev.transport, 'Transport'], ['s-nego', ev.decote, 'Décote de revente']];
+  const costs = parts.reduce((s, p) => s + p[1], 0);
+  const total = Math.max(ev.cote, costs);
+  if (ev.marge >= 0) parts.push(['s-gain', ev.marge, 'Marge']);
+  const segs = parts.filter(p => p[1] > 0).map(([c, v, t]) => `<span class="${c}" style="flex:${(v / total).toFixed(4)} 1 0" title="${esc(t)} ${esc(fmtEur(v))}"></span>`).join('');
+  const label = `Répartition de la cote de ${fmtEur(ev.cote)} : achat ${fmtEur(l.prix)}, frais ${fmtEur(ev.frais)}, transport ${fmtEur(ev.transport)}, décote ${fmtEur(ev.decote)}, marge ${fmtSigned(ev.marge)}.`;
+  return `<div class="split${lg ? ' lg' : ''}" role="img" aria-label="${esc(label)}">${segs}</div>`;
+}
+
+function fbButtons(id) {
+  const cur = Store.feedback[id] && Store.feedback[id].statut;
+  return `<div class="fb" role="group" aria-label="Votre avis">${['interessant', 'pas_interessant', 'achete'].map(v =>
+    `<button type="button" data-action="fb" data-id="${esc(id)}" data-val="${v}" aria-pressed="${cur === v}">${FB_ICONS[v]}${FB_LABELS[v]}</button>`).join('')}</div>`;
+}
+
+function thumb(l, big) {
+  if (l.photo) return `<img class="${big ? 'hero-photo' : 'thumb'}" src="${esc(l.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'${big ? 'glyph-lg' : 'glyph'}',innerHTML:carSVG({body:'${esc(l.body)}',couleur:'Gris'})}))">`;
+  return `<div class="${big ? 'glyph-lg' : 'glyph'}">${carSVG(l)}</div>`;
+}
+
+function card(l) {
+  const ev = S.evals.get(l.id);
+  const fb = Store.feedback[l.id];
+  const prio = ev.niveau === 'prioritaire';
+  const hasM = ev.cote != null && ev.marge != null;
+  const tags = [];
+  if (prio) tags.push(`<span class="tag prio">${DIAMOND(13)}Prioritaire</span>`);
+  if (l.prevPrice && l.prevPrice > l.prix) tags.push(`<span class="tag drop">${ICON.down}Baisse de ${esc(fmtEur(l.prevPrice - l.prix))}</span>`);
+  if (!ev.niveau && ev.statut === 'sous_seuil') tags.push('<span class="tag">Sous le seuil</span>');
+  if (ev.statut === 'exclue' || ev.statut === 'sans_cote') tags.push(`<span class="tag stop">${esc(motifLabel(ev))}</span>`);
+  if (l.detailIndisponible) tags.push('<span class="tag warn">Description non vérifiée</span>');
+  if (l.manual) tags.push('<span class="tag info">Saisie manuelle</span>');
+  const kmAnOver = ev.kmAn != null && ev.kmAn > S.cfgUsed.params.km_par_an_max;
+  return `<article class="card${prio ? ' prio' : ''}${fb && fb.statut === 'pas_interessant' ? ' dim' : ''}">
+    <div class="card-top">
+      ${thumb(l)}
+      <div>
+        <h3 class="card-title"><button type="button" class="card-link" data-action="open" data-id="${esc(l.id)}">${esc(l.marque)} ${esc(l.modele)}</button></h3>
+        <div class="card-version">${esc(l.version || '')}</div>
+        <div class="card-price">${esc(fmtEur(l.prix))}${l.prevPrice && l.prevPrice > l.prix ? `<s>${esc(fmtEur(l.prevPrice))}</s>` : ''}</div>
+      </div>
+      <div class="card-margin">${hasM
+        ? `<span class="m-val${ev.marge < 0 ? ' neg' : ev.niveau ? '' : ' flat'}">${esc(fmtSigned(ev.marge))}</span><span class="m-lab">marge estimée</span>`
+        : '<span class="m-val flat">—</span><span class="m-lab">non évaluable</span>'}</div>
+    </div>
+    <ul class="specs">
+      <li><b>${l.annee ?? '—'}</b></li>
+      <li><b>${fmtNum(l.km)}</b> km</li>
+      <li${kmAnOver ? ' class="over"' : ''}><b>${fmtNum(ev.kmAn)}</b> km/an</li>
+      <li>${esc(l.carburant)}</li><li>${l.boite === 'Automatique' ? 'Auto' : 'Manuelle'}</li>
+    </ul>
+    ${hasM ? `${splitBar(l, ev)}<div class="split-legend"><span>Achat <b>${esc(fmtEur(l.prix))}</b></span><span>Cote <b>${esc(fmtEur(ev.cote))}</b></span></div>` : ''}
+    ${tags.length ? `<div class="tags">${tags.join('')}</div>` : ''}
+    <div class="card-foot">
+      <span class="it">${ICON.pin}${place(l, ev)}</span>
+      ${ev.fiabilite ? `<span class="it">${signal(ev.fiabilite)}${FIAB[ev.fiabilite].label}, ${ev.n} ${plural(ev.n, 'comparable', 'comparables')}</span>` : ''}
+      <span class="it">${ICON.clock}${ago(l.first_seen_at)}</span>
+    </div>
+    ${fbButtons(l.id)}
+  </article>`;
+}
+
+function feedData() {
+  const f = S.feed;
+  const todo = [], byFb = { interessant: [], pas_interessant: [], achete: [] };
+  for (const l of S.feedItems) {
+    const fb = Store.feedback[l.id];
+    if (fb && byFb[fb.statut]) { byFb[fb.statut].push(l); continue; }
+    const ev = S.evals.get(l.id);
+    if (!S.cfgErrors && ev.niveau && l.first_seen_at >= Date.now() - f.period * DAY) todo.push(l);
+  }
+  const sorters = {
+    marge: (a, b) => (S.evals.get(b.id).marge ?? -1e9) - (S.evals.get(a.id).marge ?? -1e9),
+    recent: (a, b) => b.first_seen_at - a.first_seen_at,
+    distance: (a, b) => (S.evals.get(a.id).distance ?? 1e9) - (S.evals.get(b.id).distance ?? 1e9),
+  };
+  let items = f.status === 'todo' ? todo : byFb[f.status];
+  const prioCount = todo.filter(l => S.evals.get(l.id).niveau === 'prioritaire').length;
+  if (f.status === 'todo' && f.prioOnly) items = items.filter(l => S.evals.get(l.id).niveau === 'prioritaire');
+  items = [...items].sort(sorters[f.sort] || sorters.marge);
+  return { items, todo, byFb, prioCount };
+}
+
+function selectChip(action, value, options, label) {
+  return `<label class="select-chip"><span class="sr-only">${esc(label)}</span><select data-action="${action}">${options.map(([v, t]) => `<option value="${v}"${String(v) === String(value) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>${ICON.chev}</label>`;
+}
+
+function renderFeed() {
+  const f = S.feed, p = S.cfgUsed.params;
+  const { items, todo, byFb, prioCount } = feedData();
+  const notes = [];
+  if (S.cfgErrors) {
+    notes.push(`<div class="note stop" role="alert">${ICON.stop}<div class="note-body"><strong>Google Sheet invalide : aucune alerte n’est calculée.</strong><ul class="err-list">${S.cfgErrors.map(e => `<li>${esc(e)}</li>`).join('')}</ul>${Store.sheetUrl ? `<div class="note-actions"><a class="btn btn-ghost btn-sm" href="${esc(Store.sheetUrl)}" target="_blank" rel="noopener">Corriger dans le Google Sheet</a></div>` : ''}</div></div>`);
+  }
+  const tabs = [['todo', 'À traiter', todo.length], ['interessant', 'Intéressantes', byFb.interessant.length], ['achete', 'Achetées', byFb.achete.length], ['pas_interessant', 'Pas intéressantes', byFb.pas_interessant.length]];
+  let lede;
+  if (f.status === 'todo') {
+    lede = todo.length
+      ? `${todo.length} ${plural(todo.length, 'annonce', 'annonces')} à traiter sur ${PERIODS[f.period]}, dont ${prioCount} ${plural(prioCount, 'prioritaire', 'prioritaires')}.`
+      : `Aucune annonce à traiter sur ${PERIODS[f.period]}.`;
+  } else {
+    lede = { interessant: 'Les annonces que vous avez marquées intéressantes.', achete: 'Les véhicules que vous avez achetés.', pas_interessant: 'Les annonces écartées. Retirez votre avis pour les remettre à traiter.' }[f.status];
+  }
+  const toolbar = `<div class="toolbar">
+    ${f.status === 'todo' ? `<button type="button" class="chip" data-action="prio" aria-pressed="${f.prioOnly}">${DIAMOND(15)}Prioritaires</button>
+    ${selectChip('period', f.period, [[1, '24 heures'], [7, '7 jours'], [30, '30 jours']], 'Période')}` : ''}
+    <span class="spacer"></span>
+    ${selectChip('sort', f.sort, [['marge', 'Par marge'], ['recent', 'Par date'], ['distance', 'Par distance']], 'Trier')}
+  </div>`;
+  let list;
+  if (items.length) list = items.map(card).join('');
+  else if (f.status === 'todo' && f.prioOnly && todo.length) list = empty('Aucune alerte prioritaire', `Désactivez le filtre pour voir ${plural(todo.length, 'l’alerte normale', `les ${todo.length} alertes normales`)}.`, `<button type="button" class="btn btn-ghost" data-action="prio">Voir toutes les alertes</button>`);
+  else if (f.status === 'todo') list = empty('Rien à traiter', `Aucune nouvelle annonce ne dépasse ${fmtEur(p.marge_min_eur)} de marge sur ${PERIODS[f.period]}.`, `${f.period < 30 ? '<button type="button" class="btn btn-ghost" data-action="period-30">Voir 30 jours</button>' : ''}<a class="btn btn-ghost" href="#/reglages">Ajuster la marge minimum</a><a class="btn btn-ghost" href="#/evaluer">Évaluer une annonce</a>`);
+  else list = empty({ interessant: 'Aucune annonce intéressante', achete: 'Aucun achat enregistré', pas_interessant: 'Aucune annonce écartée' }[f.status],
+    { interessant: 'Touchez Intéressant sur une opportunité pour la garder de côté ici.', achete: 'Touchez Acheté sur une opportunité : le prix payé alimente le suivi de la négociation.', pas_interessant: 'Les annonces marquées Pas intéressant apparaîtront ici.' }[f.status],
+    '<button type="button" class="btn btn-ghost" data-action="tab" data-tab="todo">Voir les annonces à traiter</button>');
+  return `<div class="page-head"><h1>Opportunités</h1><p class="lede">${lede}</p></div>
+    ${notes.join('')}
+    <div class="tabs" role="tablist" aria-label="Statut">${tabs.map(([k, t, n]) => `<button type="button" role="tab" data-action="tab" data-tab="${k}" aria-selected="${f.status === k}">${t}<span class="count">${n}</span></button>`).join('')}</div>
+    ${toolbar}
+    <div>${list}</div>`;
+}
+function empty(title, text, btns) {
+  return `<div class="empty"><h3>${esc(title)}</h3><p>${esc(text)}</p><div class="btns">${btns || ''}</div></div>`;
+}
+
+/* ---------- Fiche détaillée ---------- */
+function openSheet(id) {
+  const sheet = $('#sheet'), scrim = $('#scrim');
+  const wasOpen = !!S.sheetId;
+  S.sheetId = id;
+  if (!wasOpen) S.lastFocus = document.activeElement;
+  renderSheet();
+  if (!S.detail[id]) {
+    loadDetail(id).then(() => { if (S.sheetId === id) renderSheet(); }).catch(e => {
+      if (S.sheetId !== id) return;
+      $('#sheet .sheet-body').innerHTML = `<div class="note stop">${ICON.stop}<div class="note-body"><strong>Annonce introuvable.</strong> ${esc(e.message)}</div></div>`;
+    });
+  }
+  sheet.hidden = false; scrim.hidden = false;
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => { sheet.classList.add('open'); scrim.classList.add('open'); });
+  if (!wasOpen) setTimeout(() => { const b = $('#sheet [data-action="close-sheet"]'); if (b) b.focus({ preventScroll: true }); }, 60);
+  $('#sheet .sheet-body').scrollTop = 0;
+}
+function closeSheet() {
+  if (S.sheetFromApp) { S.sheetFromApp = false; history.back(); }
+  else location.hash = '#/' + (S.view || 'opportunites');
+}
+function closeSheetDom() {
+  const sheet = $('#sheet'), scrim = $('#scrim');
+  S.sheetId = null;
+  sheet.classList.remove('open'); scrim.classList.remove('open');
+  document.body.style.overflow = '';
+  const done = () => { if (!S.sheetId) { sheet.hidden = true; scrim.hidden = true; } };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) done(); else setTimeout(done, 320);
+  if (S.lastFocus && document.contains(S.lastFocus)) S.lastFocus.focus({ preventScroll: true });
+}
+
+function highlight(text, kwList) {
+  const ranges = keywordRanges(text, kwList);
+  let out = '', pos = 0;
+  for (const [a, b] of ranges) {
+    if (a < pos) continue;
+    out += esc(text.slice(pos, a)) + '<mark>' + esc(text.slice(a, b)) + '</mark>';
+    pos = b;
+  }
+  return out + esc(text.slice(pos));
+}
+
+function receipt(l, ev) {
+  const p = S.cfgUsed.params;
+  const n = ev.n;
+  const rows = [
+    ['', 'Cote de marché', `médiane de ${n} ${plural(n, 'comparable', 'comparables')}`, fmtEur(ev.cote)],
+    ['s-nego', `Décote de revente ${fmtPct(p.decote_negociation_pct)}`, null, '−' + fmtEur(ev.decote)],
+    ['sub', 'Prix de revente estimé', null, fmtEur(ev.revente)],
+    ['s-buy', 'Prix d’achat', l.prevPrice > l.prix ? `affiché ${fmtEur(l.prevPrice)} auparavant` : 'prix affiché', '−' + fmtEur(l.prix)],
+    ['s-fees', `Frais ${fmtPct(p.taux_frais_pct)}`, 'du prix d’achat', '−' + fmtEur(ev.frais)],
+    ['s-transport', 'Transport', ev.distance != null ? `${fmtKm(ev.distance)} × ${nf2.format(p.cout_transport_eur_km)}${NB}€/km` : 'base non renseignée', Math.round(ev.transport) ? '−' + fmtEur(ev.transport) : fmtEur(0)],
+  ];
+  const html = rows.map(([c, k, sub, v]) => `<div class="r${c === 'sub' ? ' sub' : ''}"><span class="k">${c && c !== 'sub' ? `<span class="sw ${c}"></span>` : ''}<span>${esc(k)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></span><span class="v">${esc(v)}</span></div>`).join('');
+  let th;
+  if (ev.niveau === 'prioritaire') th = `Alerte prioritaire : la marge dépasse ${fmtEur(p.marge_prioritaire_eur)}.`;
+  else if (ev.niveau === 'normale') th = `Alerte normale : il manque ${fmtEur(p.marge_prioritaire_eur - ev.marge)} pour passer prioritaire.`;
+  else th = `Sous le seuil d’alerte : il manque ${fmtEur(p.marge_min_eur - ev.marge)} pour atteindre ${fmtEur(p.marge_min_eur)}.`;
+  return `<div class="receipt">${html}<div class="r total"><span class="k"><span class="sw s-gain"></span>Marge nette estimée</span><span class="v${ev.marge < 0 ? ' neg' : ''}">${esc(fmtSigned(ev.marge))}</span></div></div>
+    ${splitBar(l, ev, true)}<p class="threshold">${esc(th)}</p>`;
+}
+
+function niceTicks(a, b, n) {
+  const span = b - a || 1;
+  const step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0)), f = step0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  const out = [];
+  for (let v = Math.ceil(a / step) * step; v <= b + 1e-9; v += step) out.push(v);
+  return out;
+}
+function scatter(l, ev) {
+  const W = 340, H = 190, pl = 60, pr = 12, pt = 14, pb = 30;
+  const pts = ev.comps;
+  const xs = pts.map(c => c.km).concat(l.km), ys = pts.map(c => c.prix).concat(l.prix, ev.cote);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const px = (x1 - x0) * .08 || 5000, py = (y1 - y0) * .1 || 800;
+  x0 = Math.max(0, x0 - px); x1 += px; y0 = Math.max(0, y0 - py); y1 += py;
+  const X = v => pl + (v - x0) / (x1 - x0) * (W - pl - pr);
+  const Y = v => pt + (1 - (v - y0) / (y1 - y0)) * (H - pt - pb);
+  const xt = niceTicks(x0, x1, 3), yt = niceTicks(y0, y1, 3);
+  const grid = yt.map(v => `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="axis-l" x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end">${nf0.format(v)}${NB}€</text>`).join('')
+    + xt.map(v => `<text class="axis-l" x="${X(v)}" y="${H - 10}" text-anchor="middle">${nf0.format(v)}${NB}km</text>`).join('');
+  const dots = pts.map(c => `<circle class="dot${c.vendeur === 'pro' ? ' pro' : ''}" cx="${X(c.km).toFixed(1)}" cy="${Y(c.prix).toFixed(1)}" r="4"><title>${c.annee}, ${fmtKm(c.km)}, ${fmtEur(c.prix)}</title></circle>`).join('');
+  const my = Y(ev.cote);
+  const me = `<rect class="me" x="${X(l.km) - 6}" y="${Y(l.prix) - 6}" width="12" height="12" transform="rotate(45 ${X(l.km)} ${Y(l.prix)})"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Prix des comparables selon le kilométrage, avec la cote et cette annonce">${grid}<line class="med" x1="${pl}" x2="${W - pr}" y1="${my}" y2="${my}"/><text class="med-l" x="${W - pr}" y="${my - 5}" text-anchor="end">Cote ${esc(fmtEur(ev.cote))}</text>${dots}${me}</svg>
+    <div class="chart-legend"><span><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" class="dot" style="fill:var(--bar-fees)"/></svg>Particulier</span><span><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.6" style="fill:none;stroke:var(--bar-fees);stroke-width:1.5"/></svg>Professionnel</span><span>${DIAMOND(12)}Cette annonce</span></div>`;
+}
+
+function renderSheet() {
+  const id = S.sheetId, l = S.byId.get(id);
+  if (!l) {
+    $('#sheet .sheet-head').innerHTML = `<button type="button" class="icon-btn" data-action="close-sheet" aria-label="Fermer la fiche">${ICON.back}</button>`;
+    $('#sheet .sheet-body').innerHTML = '<p class="muted">Chargement de l’annonce…</p>';
+    $('#sheet .sheet-foot').innerHTML = '';
+    return;
+  }
+  const detail = S.detail[id];
+  const ci = detail && detail.compsInfo;
+  const ev = S.evals.get(id), p = S.cfgUsed.params;
+  const src = SOURCES[l.source] || 'Saisie manuelle';
+  const link = l.url && /^https?:/.test(l.url)
+    ? `<a class="btn btn-ghost btn-sm" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${ICON.ext}Voir l’annonce</a>`
+    : `<span class="btn btn-ghost btn-sm" aria-disabled="true" title="${l.demo ? 'Les annonces de démonstration n’ont pas de lien' : 'Aucun lien saisi'}">${ICON.ext}Voir l’annonce</span>`;
+  $('#sheet .sheet-head').innerHTML = `<button type="button" class="icon-btn" data-action="close-sheet" aria-label="Fermer la fiche">${ICON.back}</button><span class="src">${esc(src)}</span>${link}`;
+  const tags = [];
+  if (ev.niveau === 'prioritaire') tags.push(`<span class="tag prio">${DIAMOND(13)}Prioritaire</span>`);
+  else if (ev.niveau === 'normale') tags.push('<span class="tag">Alerte normale</span>');
+  if (l.prevPrice > l.prix) tags.push(`<span class="tag drop">${ICON.down}Baisse de ${esc(fmtEur(l.prevPrice - l.prix))}</span>`);
+  tags.push(`<span class="tag">${l.vendeur === 'pro' ? 'Professionnel' : 'Particulier'}</span>`);
+  let status = '';
+  if (ev.statut === 'exclue') status = `<div class="note stop">${ICON.stop}<div class="note-body"><strong>Exclue : ${esc(motifLabel(ev))}.</strong> ${esc(exclusionHelp(l, ev))}</div></div>`;
+  else if (ev.statut === 'sans_cote') status = `<div class="note warn">${ICON.warn}<div class="note-body"><strong>Aucune annonce comparable</strong> sur ${p.fenetre_comparables_jours} jours, même en élargissant à année ±2 et ±40${NB}000${NB}km. La marge ne peut pas être estimée.</div></div>`;
+  if (l.detailIndisponible) status += `<div class="note warn">${ICON.warn}<div class="note-body"><strong>Page de l’annonce inaccessible.</strong> L’évaluation utilise les seules données de l’email d’alerte : la description n’a pas été vérifiée.</div></div>`;
+  const kmAnOver = ev.kmAn != null && ev.kmAn > p.km_par_an_max;
+  const comps = [...ev.comps].sort((a, b) => Math.abs(a.km - l.km) - Math.abs(b.km - l.km));
+  const fb = Store.feedback[id];
+  const body = `
+    <div class="d-hero">
+      <div class="hero-media">${thumb(l, true)}</div>
+      <div><h2 class="d-title" id="sheet-title">${esc(l.marque)} ${esc(l.modele)}</h2><div class="d-version">${esc(l.version || '')}</div></div>
+      <div class="d-price"><span class="p">${esc(fmtEur(l.prix))}</span>${l.prevPrice > l.prix ? `<s>${esc(fmtEur(l.prevPrice))}</s>` : ''}</div>
+    </div>
+    <div class="tags">${tags.join('')}</div>
+    ${fb && fb.statut === 'achete' ? `<div class="note good" style="margin-top:14px">${ICON.key}<div class="note-body"><strong>Achetée${fb.prix_achat ? ` ${esc(fmtEur(fb.prix_achat))}` : ''}.</strong>${fb.prix_achat ? ` Remise obtenue : ${esc(fmtEur(l.prix - fb.prix_achat))}.` : ''}</div></div>` : ''}
+    <div style="margin-top:14px">${status}</div>
+    ${ev.cote != null && ev.marge != null ? `<section><h2>Marge estimée</h2>${receipt(l, ev)}</section>` : ''}
+    ${!detail && ev.n ? '<section><h2>Comparables</h2><p class="muted">Chargement des comparables…</p></section>' : ''}
+    ${ev.comps.length && ci && ci.fiabilite ? `<section><h2>Comparables</h2><div class="panel">
+      <p class="small" style="margin:0 0 10px;display:flex;gap:8px;align-items:flex-start">${signal(ci.fiabilite)}<span><strong>Marché actuel : ${FIAB[ci.fiabilite].label.toLowerCase()}.</strong> ${esc(fiabText(ci))}</span></p>
+      ${ev.cote != null && (ci.n !== ev.n || Math.round(ci.cote) !== Math.round(ev.cote)) ? `<p class="small muted" style="margin:-4px 0 10px">L’évaluation a retenu une cote de ${esc(fmtEur(ev.cote))} sur ${ev.n} ${plural(ev.n, 'comparable', 'comparables')}. Le marché a évolué depuis : cote actuelle ${esc(fmtEur(ci.cote))}.</p>` : ''}
+      ${scatter(l, { comps: ev.comps, cote: ci.cote })}
+      <table class="comp-table"><thead><tr><th>Année</th><th>Kilométrage</th><th class="r">Prix</th><th>Vendeur</th></tr></thead><tbody>
+      ${comps.slice(0, 8).map(c => `<tr><td>${c.annee}</td><td>${fmtNum(c.km)}</td><td class="r">${esc(fmtEur(c.prix))}</td><td class="t">${c.vendeur === 'pro' ? 'Pro' : 'Particulier'}, ${esc(c.ville)}</td></tr>`).join('')}
+      </tbody></table>${comps.length > 8 ? `<p class="small muted" style="margin:8px 0 0">Et ${comps.length - 8} ${plural(comps.length - 8, 'autre', 'autres')}.</p>` : ''}
+    </div></section>` : ''}
+    <section><h2>Caractéristiques</h2><dl class="specs-grid">
+      ${[['Année', l.annee ?? '—'], ['Kilométrage', fmtKm(l.km)], ['Kilomètres par an', `<span${kmAnOver ? ' style="color:var(--stop)"' : ''}>${fmtKm(ev.kmAn)}</span>`], ['Carburant', esc(l.carburant)], ['Boîte', esc(l.boite)], ['Couleur', esc(l.couleur || '—')],
+        ['Localisation', `${esc(l.ville || '—')} ${esc(l.cp || '')}`], ['Distance de la base', ev.distance != null ? `${fmtKm(ev.distance)} par la route` : (p.base_code_postal ? 'Lieu inconnu' : 'Base non renseignée')],
+        ['Première vue', esc(dtf.format(l.first_seen_at))], ['Dernière vue', esc(dtf.format(l.last_seen_at))]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+    </dl></section>
+    <section><h2>Description</h2>${detail ? (detail.description ? `<p class="desc">${highlight(detail.description, S.ctx.kwList)}</p>` : '<p class="muted">Description non disponible.</p>') : '<p class="muted">Chargement…</p>'}</section>
+    <p class="meta">${ev.evaluatedAt ? `Évaluée le ${esc(dtf.format(ev.evaluatedAt))} avec la version ${esc(ev.configVersion || '')} des réglages.` : 'Pas encore évaluée.'}</p>`;
+  $('#sheet .sheet-body').innerHTML = body;
+  $('#sheet .sheet-foot').innerHTML = fbButtons(id);
+}
+function fiabText(ev) {
+  const p = S.cfgUsed.params, n = ev.n;
+  if (ev.fiabilite === 'fiable') return `${n} annonces du même modèle, carburant et boîte, année ±1 et ±20${NB}000${NB}km, vues sur ${p.fenetre_comparables_jours} jours.`;
+  if (ev.fiabilite === 'moyenne') return `Critères élargis à année ±2 et ±40${NB}000${NB}km pour réunir ${n} comparables.`;
+  return `Seulement ${n} ${plural(n, 'comparable', 'comparables')}, même après élargissement. Vérifiez la cote avant d’appeler.`;
+}
+function exclusionHelp(l, ev) {
+  const p = S.cfgUsed.params;
+  switch (ev.motif.code) {
+    case 'prix_hors_bornes': return `Le prix sort de la fourchette ${fmtEur(p.prix_min_eur)} à ${fmtEur(p.prix_max_eur)}.`;
+    case 'vendeur_pro': return 'Seuls les particuliers sont alertés. L’annonce sert quand même à calculer la cote des autres.';
+    case 'km_max': return `Le kilométrage dépasse ${fmtKm(p.km_max)}.`;
+    case 'km_par_an': return `${fmtKm(ev.kmAn)} par an, au-delà du maximum de ${fmtKm(p.km_par_an_max)}.`;
+    case 'mot_cle': return 'Le mot-clé est surligné dans la description. S’il s’agit d’une fausse alerte, retirez-le des réglages.';
+    case 'donnees_incompletes': return 'Le prix, l’année ou le kilométrage manque : l’annonce ne peut pas être évaluée.';
+    default: return '';
+  }
+}
+
+/* ============================================================
+   Évaluer une annonce (calcul fait par le serveur, mêmes règles que les alertes)
+   ============================================================ */
+const FUELS = ['Essence', 'Diesel', 'Hybride', 'Électrique', 'GPL'];
+function emptyEvalForm() {
+  return { source: 'manuel', url: '', marque: '', modele: '', version: '', annee: '', km: '', carburant: 'Essence', boite: 'Manuelle', prix: '', vendeur: 'particulier', cp: '', ville: '', description: '' };
+}
+const toInt = v => { const n = parseNumberFr(v); return isNaN(n) ? null : Math.round(n); };
+function missingFields(e) {
+  const miss = [];
+  if (!e.marque.trim()) miss.push('la marque');
+  if (!e.modele.trim()) miss.push('le modèle');
+  if (toInt(e.prix) == null) miss.push('le prix');
+  if (toInt(e.annee) == null) miss.push('l’année');
+  if (toInt(e.km) == null) miss.push('le kilométrage');
+  return miss;
+}
+function joinFr(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' et ' + a[a.length - 1]; }
+
+function segCtl(name, value, options) {
+  return `<div class="seg-ctl" role="group">${options.map(([v, t]) => `<button type="button" data-ev-seg="${name}" data-v="${v}" aria-pressed="${value === v}">${esc(t)}</button>`).join('')}</div>`;
+}
+function evField(name, label, opts = {}) {
+  const v = S.ev[name], id = 'ev-' + name;
+  const ctl = opts.select
+    ? `<div class="iw"><select id="${id}" class="input" data-ev="${name}">${opts.select.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>${ICON.chev}</div>`
+    : opts.textarea
+      ? `<textarea id="${id}" class="input" data-ev="${name}" placeholder="${esc(opts.ph || '')}">${esc(v)}</textarea>`
+      : `<div class="iw"><input id="${id}" class="input" data-ev="${name}" value="${esc(v)}" ${opts.attrs || ''} placeholder="${esc(opts.ph || '')}"${opts.unit ? ` style="padding-right:${opts.unit.length * 9 + 22}px"` : ''}>${opts.unit ? `<span class="unit">${esc(opts.unit)}</span>` : ''}</div>`;
+  return `<div class="field${opts.full ? ' full' : ''}"><label for="${id}">${esc(label)}</label>${ctl}${opts.help ? `<span class="help">${esc(opts.help)}</span>` : ''}</div>`;
+}
+function renderEvaluate() {
+  if (!S.ev) S.ev = emptyEvalForm();
+  const marques = [...new Set(MODELS.map(m => m.marque))].sort();
+  const modeles = MODELS.filter(m => !S.ev.marque || strip(m.marque) === strip(S.ev.marque).trim()).map(m => m.modele);
+  return `<div class="page-head"><h1>Évaluer une annonce</h1><p class="lede">Saisissez une annonce repérée à la main : la marge est calculée avec les mêmes règles et les mêmes comparables que les alertes.</p></div>
+  <div class="eval-layout">
+    <form class="panel" id="eval-form" autocomplete="off" onsubmit="return false">
+      <div class="form-grid">
+        ${evField('url', 'Lien de l’annonce', { full: true, attrs: 'type="url" inputmode="url"', ph: 'https://' })}
+        ${evField('marque', 'Marque', { attrs: 'list="dl-marques" autocapitalize="words"', ph: 'Peugeot' })}
+        ${evField('modele', 'Modèle', { attrs: 'list="dl-modeles"', ph: '208' })}
+        ${evField('version', 'Version', { full: true, ph: '1.2 PureTech 100 Allure' })}
+        ${evField('annee', 'Année', { attrs: 'inputmode="numeric" maxlength="4"', ph: '2019' })}
+        ${evField('km', 'Kilométrage', { attrs: 'inputmode="numeric"', unit: 'km', ph: '85 000' })}
+        ${evField('carburant', 'Carburant', { select: FUELS })}
+        <div class="field"><span class="label">Boîte</span>${segCtl('boite', S.ev.boite, [['Manuelle', 'Manuelle'], ['Automatique', 'Auto']])}</div>
+        ${evField('prix', 'Prix affiché', { attrs: 'inputmode="numeric"', unit: '€', ph: '9 500' })}
+        <div class="field"><span class="label">Vendeur</span>${segCtl('vendeur', S.ev.vendeur, [['particulier', 'Particulier'], ['pro', 'Pro']])}</div>
+        ${evField('cp', 'Code postal', { attrs: 'inputmode="numeric" maxlength="5" autocomplete="postal-code"', ph: '69003' })}
+        ${evField('ville', 'Ville', { ph: 'Lyon' })}
+        ${evField('description', 'Description', { full: true, textarea: true, ph: 'Collez la description du vendeur', help: 'Les mots-clés d’exclusion y sont recherchés.' })}
+      </div>
+      <div class="toolbar" style="margin-bottom:0"><button type="button" class="btn btn-quiet btn-sm" data-action="ev-clear">Effacer</button></div>
+      <datalist id="dl-marques">${marques.map(m => `<option value="${esc(m)}">`).join('')}</datalist>
+      <datalist id="dl-modeles">${[...new Set(modeles)].map(m => `<option value="${esc(m)}">`).join('')}</datalist>
+    </form>
+    <div class="eval-result" id="eval-result" tabindex="-1"></div>
+  </div>
+  <div class="peek" id="eval-peek" hidden></div>`;
+}
+let evSeq = 0;
+async function updateEvalResult() {
+  const box = $('#eval-result'), peek = $('#eval-peek');
+  if (!box) return;
+  const miss = missingFields(S.ev);
+  if (miss.length) {
+    box.innerHTML = `<div class="panel"><h2>Estimation</h2><p class="muted" style="margin:0">Renseignez ${esc(joinFr(miss))} pour estimer la marge.</p></div>`;
+    peek.hidden = true;
+    return;
+  }
+  const seq = ++evSeq;
+  box.querySelector('.panel')?.classList.add('busy');
+  let res;
+  try {
+    res = await Api.post('/api/evaluate', S.ev);
+  } catch (e) {
+    if (seq !== evSeq) return;
+    box.innerHTML = `<div class="note stop">${ICON.stop}<div class="note-body"><strong>Estimation impossible.</strong> ${esc(e.message)}</div></div>`;
+    return;
+  }
+  if (seq !== evSeq) return;  // une saisie plus récente est en cours
+  const ev = { ...res.ev, comps: [] };
+  const d = { prix: toInt(S.ev.prix), prevPrice: null };
+  let head, peekV, peekL;
+  if (ev.statut === 'exclue') {
+    head = `<div class="note stop">${ICON.stop}<div class="note-body"><strong>Exclue : ${esc(motifLabel(ev))}.</strong> ${esc(exclusionHelp(d, ev))}</div></div>`;
+    peekV = 'Exclue'; peekL = motifLabel(ev);
+  } else if (ev.statut === 'sans_cote') {
+    head = `<div class="note warn">${ICON.warn}<div class="note-body"><strong>Aucun comparable trouvé.</strong> Vérifiez l’orthographe de la marque et du modèle, ou comparez à la main.</div></div>`;
+    peekV = '—'; peekL = 'Aucun comparable';
+  } else {
+    const lvl = ev.niveau === 'prioritaire' ? `<span class="tag prio">${DIAMOND(13)}Alerte prioritaire</span>` : ev.niveau ? '<span class="tag">Alerte normale</span>' : '<span class="tag">Sous le seuil</span>';
+    head = `<div class="tags" style="margin:0 0 12px">${lvl}<span class="tag">${signal(ev.fiabilite)}${FIAB[ev.fiabilite].label}, ${ev.n} ${plural(ev.n, 'comparable', 'comparables')}</span></div>${receipt(d, ev)}`;
+    peekV = fmtSigned(ev.marge); peekL = ev.niveau === 'prioritaire' ? 'Alerte prioritaire' : ev.niveau ? 'Alerte normale' : 'Sous le seuil';
+  }
+  const place = !res.geocoded ? '<p class="small muted">Lieu non reconnu : le transport est compté à 0 €.</p>' : '';
+  box.innerHTML = `<div class="panel"><h2>Estimation</h2>${head}${place}
+    <div class="toolbar" style="margin:14px 0 0"><button type="button" class="btn btn-primary" data-action="ev-save">${ICON.plus}Enregistrer dans les annonces</button></div>
+    <p class="small muted" style="margin:8px 0 0">L’annonce enregistrée rejoint la liste et sert de comparable pour les suivantes.</p></div>`;
+  peek.hidden = false;
+  peek.innerHTML = `<div><span class="v${ev.niveau ? ' gain' : ''}">${esc(peekV)}</span><span class="l" style="display:block">${esc(peekL)}</span></div><button type="button" class="btn btn-sm" data-action="ev-scroll">Voir le détail</button>`;
+}
+let evTimer = null;
+function onEvInput() { clearTimeout(evTimer); evTimer = setTimeout(updateEvalResult, 450); }
+async function saveEval() {
+  if (missingFields(S.ev).length) return;
+  try {
+    const r = await Api.post('/api/manual', S.ev);
+    S.ev = emptyEvalForm();
+    renderView();
+    toast('Annonce enregistrée');
+    S.sheetFromApp = true;
+    location.hash = '#/annonce/' + encodeURIComponent(r.id);
+  } catch (e) {
+    toast('Enregistrement impossible : ' + e.message);
+  }
+}
+
+/* ============================================================
+   Toutes les annonces (recherche et pagination côté serveur)
+   ============================================================ */
+const LIST_FILTERS = [['all', 'Toutes'], ['alerte', 'Alertes'], ['sous_seuil', 'Sous le seuil'], ['exclue', 'Exclues'], ['sans_cote', 'Sans cote']];
+const MOTIFS_SHORT = { prix_hors_bornes: 'Prix hors fourchette', vendeur_pro: 'Vendeur pro', km_max: 'Trop de km', km_par_an: 'Trop de km par an', donnees_incompletes: 'Incomplète', cote_indisponible: 'Sans comparable' };
+function shortMotif(ev) { return ev.motif.code === 'mot_cle' ? `« ${ev.motif.detail} »` : (MOTIFS_SHORT[ev.motif.code] || motifLabel(ev)); }
+
+async function loadList(append) {
+  const L = S.list;
+  if (!append) L.offset = 0;
+  L.loading = true; L.error = null;
+  const seq = (L.seq = (L.seq || 0) + 1);
+  updateList();
+  try {
+    const qs = new URLSearchParams({ q: L.q, statut: L.statut, limit: '50', offset: String(L.offset) });
+    const r = await Api.get('/api/listings?' + qs);
+    if (seq !== L.seq) return;
+    const items = ingest(r.items);
+    L.items = append ? L.items.concat(items) : items;
+    L.counts = r.counts; L.total = r.total; L.hasMore = r.items.length === 50;
+  } catch (e) {
+    if (seq === L.seq) L.error = e.message;
+  }
+  if (seq === L.seq) { L.loading = false; updateList(); }
+}
+function renderListings() {
+  return `<div class="page-head"><h1>Toutes les annonces</h1><p class="lede">Les annonces reçues sur 90 jours. Toutes sont conservées, alertées ou non : elles servent à calculer la cote.</p></div>
+    <div class="search"><label class="sr-only" for="list-q">Rechercher</label>${ICON.search}<input id="list-q" class="input" type="search" placeholder="Marque, modèle, ville, année" value="${esc(S.list.q)}" data-list-q></div>
+    <div class="toolbar" id="list-chips"></div>
+    <div id="list-rows"></div>`;
+}
+function listChips() {
+  const c = S.list.counts, all = Object.values(c).reduce((a, b) => a + b, 0);
+  return LIST_FILTERS.map(([k, t]) => `<button type="button" class="chip sel" data-action="list-statut" data-k="${k}" aria-pressed="${S.list.statut === k}">${t}<span class="count">${fmtNum(k === 'all' ? all : (c[k] || 0))}</span></button>`).join('');
+}
+function listRows() {
+  const L = S.list;
+  if (L.error) return `<div class="note stop">${ICON.stop}<div class="note-body">${esc(L.error)}</div></div>`;
+  if (!L.items.length) return L.loading ? '<p class="muted">Chargement…</p>' : empty('Aucune annonce', L.q ? 'Aucune annonce ne correspond à cette recherche.' : 'Aucune annonce dans cette catégorie pour l’instant.', L.q ? '<button type="button" class="btn btn-ghost" data-action="list-clear">Effacer la recherche</button>' : '');
+  const rows = L.items.map(l => {
+    const ev = S.evals.get(l.id);
+    let end;
+    if (ev.statut === 'alerte') end = `<span class="v gain">${esc(fmtSigned(ev.marge))}</span>${ev.niveau === 'prioritaire' ? `<span style="display:inline-flex;align-items:center;gap:4px">${DIAMOND(12)}Prioritaire</span>` : '<span class="muted">Alerte</span>'}`;
+    else if (ev.statut === 'sous_seuil') end = `<span class="v flat">${esc(fmtSigned(ev.marge))}</span><span class="muted">Sous le seuil</span>`;
+    else if (ev.motif) end = `<span style="color:var(--stop);font-weight:600">${esc(shortMotif(ev))}</span>`;
+    else end = '<span class="muted">Non évaluée</span>';
+    return `<button type="button" class="row-item" data-action="open" data-id="${esc(l.id)}"><span style="min-width:0"><span class="ri-title">${esc(l.titre || `${l.marque} ${l.modele}`)}</span><span class="ri-sub"><span>${l.annee ?? '—'}</span><span>${esc(fmtKm(l.km))}</span><span>${esc(fmtEur(l.prix))}</span><span>${esc(l.ville || '')}</span><span>${l.first_seen_at ? ago(l.first_seen_at) : ''}</span></span></span><span class="ri-end">${end}</span></button>`;
+  }).join('');
+  const more = L.hasMore ? `<div class="more"><button type="button" class="btn btn-ghost" data-action="list-more"${L.loading ? ' disabled' : ''}>${L.loading ? 'Chargement…' : 'Afficher 50 de plus'}</button></div>` : '';
+  return `<div class="rows">${rows}</div>${more}`;
+}
+function updateList() {
+  const chips = $('#list-chips'), rows = $('#list-rows');
+  if (chips) chips.innerHTML = listChips();
+  if (rows) rows.innerHTML = listRows();
+}
+
+/* ============================================================
+   Suivi (agrégats calculés par BigQuery sur 90 jours)
+   ============================================================ */
+async function loadStats() {
+  try { S.stats = await Api.get('/api/stats'); S.statsError = null; } catch (e) { S.statsError = e.message; }
+  if (S.view === 'suivi') renderView();
+}
+function dayBars(perDay) {
+  const days = 14, W = 340, H = 140, pl = 4, pb = 22, pt = 8;
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const t0 = start.getTime() - (days - 1) * DAY;
+  const buckets = Array.from({ length: days }, (_, i) => ({ d: new Date(t0 + i * DAY), p: 0, n: 0 }));
+  for (const r of perDay) {
+    const i = Math.round((new Date(r.jour + 'T00:00:00').getTime() - t0) / DAY);
+    if (i >= 0 && i < days) buckets[i][r.alert_level === 'prioritaire' ? 'p' : 'n'] += r.n;
+  }
+  const max = Math.max(3, ...buckets.map(b => b.p + b.n));
+  const bw = (W - pl * 2) / days, Y = v => (H - pb - pt) * v / max;
+  const bars = buckets.map((b, i) => {
+    const x = pl + i * bw + 3, w = bw - 6, hn = Y(b.n), hp = Y(b.p);
+    const lab = (days - 1 - i) % 2 === 0 ? `<text class="axis-l" x="${x + w / 2}" y="${H - 6}" text-anchor="middle">${b.d.getDate()}</text>` : '';
+    return `<rect x="${x}" y="${H - pb - hn}" width="${w}" height="${hn}" rx="2" style="fill:var(--bar-fees)"><title>${b.n} normales</title></rect><rect x="${x}" y="${H - pb - hn - hp}" width="${w}" height="${hp}" rx="2" style="fill:var(--prio)"><title>${b.p} prioritaires</title></rect>${lab}`;
+  }).join('');
+  return { svg: `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Alertes par jour sur 14 jours"><line class="grid" x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}"/>${bars}</svg>
+    <div class="chart-legend"><span><span class="sw" style="background:var(--prio)"></span>Prioritaires</span><span><span class="sw" style="background:var(--bar-fees)"></span>Normales</span></div>`, buckets };
+}
+function renderSuivi() {
+  const head = `<div class="page-head"><h1>Suivi</h1><p class="lede">Ce que l’outil a trouvé et ce que vous en avez fait, pour ajuster les seuils après quelques semaines.</p></div>`;
+  if (S.statsError) return head + `<div class="note stop">${ICON.stop}<div class="note-body">${esc(S.statsError)}</div></div>`;
+  if (!S.stats) { loadStats(); return head + '<p class="muted">Chargement des statistiques…</p>'; }
+  const st = S.stats, p = S.cfgUsed.params;
+  const by = Object.fromEntries(st.by_status.map(r => [r.statut, r.n]));
+  const fbc = Object.fromEntries(st.feedback.map(r => [r.status, r.n]));
+  const total = Object.values(by).reduce((a, b) => a + b, 0);
+  const { svg, buckets } = dayBars(st.per_day);
+  const last7 = buckets.slice(-7), recent = last7.reduce((s, b) => s + b.p + b.n, 0), recentP = last7.reduce((s, b) => s + b.p, 0);
+  const nFb = Object.values(fbc).reduce((a, b) => a + b, 0), pos = (fbc.interessant || 0) + (fbc.achete || 0);
+  const funnel = [['Annonces reçues', total, ''], ['Passent les filtres', total - (by.exclue || 0), ''], ['Avec une cote', (by.sous_seuil || 0) + (by.alerte || 0), ''], ['Alertes', by.alerte || 0, 'alert'], ['Intéressantes ou achetées', pos, 'gain'], ['Achetées', fbc.achete || 0, 'gain']];
+  const fmax = total || 1, mmax = st.motifs.length ? st.motifs[0].n : 1;
+  const buys = st.purchases;
+  const withPrice = buys.filter(b => b.purchase_price_eur && b.price_eur);
+  const avgNego = withPrice.length ? withPrice.reduce((s, b) => s + (b.price_eur - b.purchase_price_eur) / b.price_eur * 100, 0) / withPrice.length : null;
+  const buyRows = buys.map(b => {
+    const paid = b.purchase_price_eur;
+    const m = b.margin_eur == null ? null : paid ? b.margin_eur + (b.price_eur - paid) * (1 + p.taux_frais_pct / 100) : b.margin_eur;
+    return `<tr><td><button type="button" class="card-link" style="position:static" data-action="open" data-id="${esc(b.source + ':' + b.listing_id)}">${esc(b.brand || '')} ${esc(b.model || '')} ${b.year ?? ''}</button></td><td>${esc(fmtEur(b.price_eur))}</td><td>${paid ? esc(fmtEur(paid)) : '—'}</td><td>${paid ? esc(fmtPct((b.price_eur - paid) / b.price_eur * 100)) : '—'}</td><td style="color:var(--gain);font-weight:600">${esc(fmtSigned(m))}</td></tr>`;
+  }).join('');
+  return head + `
+  <div class="kpis">
+    <div class="kpi"><span class="v">${recent}</span><span class="l">alertes sur 7 jours</span></div>
+    <div class="kpi"><span class="v">${recentP}</span><span class="l">dont prioritaires</span></div>
+    <div class="kpi"><span class="v">${nFb ? esc(fmtPct(pos / nFb * 100, 0)) : '—'}</span><span class="l">des avis sont positifs</span></div>
+    <div class="kpi"><span class="v">${fbc.achete || 0}</span><span class="l">${plural(fbc.achete || 0, 'véhicule acheté', 'véhicules achetés')}</span></div>
+  </div>
+  <section><h2>Alertes par jour</h2><div class="panel">${svg}</div></section>
+  <section><h2>De l’annonce à l’achat</h2><div class="panel funnel">${funnel.map(([t, n, c]) => `<div class="fn-row"><span class="fn-lab">${t}</span><span class="fn-track"><span class="fn-bar ${c}" style="width:${Math.max(.6, n / fmax * 78)}%"></span><span class="fn-val">${fmtNum(n)}<small>${fmtPct(n / fmax * 100, n / fmax < .1 ? 1 : 0)}</small></span></span></div>`).join('')}</div></section>
+  <section><h2>Pourquoi les annonces sont écartées</h2><div class="panel funnel">${st.motifs.length ? st.motifs.map(r => `<div class="fn-row"><span class="fn-lab">${esc(MOTIFS[r.motif] || r.motif)}</span><span class="fn-track"><span class="fn-bar" style="width:${Math.max(.6, r.n / mmax * 78)}%;background:var(--stop);opacity:.75"></span><span class="fn-val">${fmtNum(r.n)}</span></span></div>`).join('') : '<p class="muted small" style="margin:0">Aucune annonce écartée pour l’instant.</p>'}
+    <p class="small muted" style="margin:6px 0 0">Les annonces de professionnels écartées restent utilisées pour la cote.</p></div></section>
+  <section><h2>Achats</h2>${buys.length ? `
+    <div class="note${avgNego != null ? ' good' : ''}">${ICON.info}<div class="note-body">${avgNego != null
+      ? `<strong>Remise moyenne obtenue : ${esc(fmtPct(avgNego))}</strong> sur ${withPrice.length} ${plural(withPrice.length, 'achat', 'achats')}. C’est un repère pour ajuster la décote de revente, réglée à ${esc(fmtPct(p.decote_negociation_pct))}.`
+      : 'Indiquez le prix payé lors du marquage Acheté pour mesurer la négociation obtenue.'}</div></div>
+    <div class="panel table-scroll"><table class="buy-table"><thead><tr><th>Véhicule</th><th>Affiché</th><th>Payé</th><th>Remise</th><th>Marge estimée</th></tr></thead><tbody>${buyRows}</tbody></table></div>`
+    : empty('Aucun achat enregistré', 'Marquez une opportunité Acheté et indiquez le prix payé : la remise obtenue s’affichera ici.', '<a class="btn btn-ghost" href="#/opportunites">Voir les opportunités</a>')}</section>`;
+}
+
+/* ============================================================
+   Réglages : lecture seule, la référence est le Google Sheet
+   ============================================================ */
+function paramValue(key, v) {
+  const m = PARAM_META[key];
+  if (m.kind === 'bool') return v ? 'Oui' : 'Non';
+  if (m.kind === 'select') return (m.options.find(o => o.value === v) || { label: v }).label;
+  if (m.kind === 'cp') { if (!v) return 'À renseigner'; const g = geocode(v); return g ? `${v}, ${g.label}` : v; }
+  if (v == null || v === '') return '—';
+  const n = m.kind === 'dec' ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(v) : fmtNum(v);
+  return m.unit ? `${n}${NB}${m.unit}` : n;
+}
+function renderSettings() {
+  const p = S.cfgUsed.params;
+  const sheet = Store.sheetUrl
+    ? `<a class="btn btn-primary" href="${esc(Store.sheetUrl)}" target="_blank" rel="noopener">${ICON.ext}Modifier dans le Google Sheet</a>` : '';
+  const errors = S.cfgErrors
+    ? `<div class="note stop" role="alert">${ICON.stop}<div class="note-body"><strong>Le Google Sheet contient des erreurs : les alertes sont suspendues.</strong><ul class="err-list">${S.cfgErrors.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div></div>` : '';
+  return `<div class="page-head"><h1>Réglages</h1><p class="lede">Les réglages se modifient dans le Google Sheet partagé. Ils sont relus à chaque run, toutes les 10 minutes, et une valeur invalide suspend les alertes plutôt que de filtrer avec une configuration fausse.</p>
+    <div class="toolbar">${sheet}<button type="button" class="btn btn-ghost" data-action="reload-config">Relire le Sheet</button></div></div>
+    ${errors}
+    ${PARAM_GROUPS.map(g => `<div class="group"><h2>${esc(g.title)}</h2>${g.intro ? `<p>${esc(g.intro)}</p>` : ''}<div class="group-body">${g.keys.map(k => `
+      <div class="field row"><span class="label">${esc(PARAM_META[k].label)}</span><span class="ctl ro-value">${esc(paramValue(k, p[k]))}</span>${PARAM_META[k].help ? `<span class="help">${esc(PARAM_META[k].help)}</span>` : ''}</div>`).join('')}</div></div>`).join('')}
+    <div class="group"><h2>Mots-clés d’exclusion</h2><p>Recherchés dans le titre et la description, sans tenir compte des accents ni des majuscules, sur des mots entiers.</p>
+      <div class="group-body"><div class="kw-editor"><ul class="kw-list" style="margin:0">${S.cfgUsed.keywords.map(k => `<li style="padding-right:11px">${esc(k)}</li>`).join('')}</ul></div></div></div>
+    <p class="small muted">Version des réglages : ${esc(S.cfgUsed.version)}. Chaque évaluation enregistre la version utilisée.</p>`;
+}
+
+/* ============================================================
+   Retours (Intéressant, Pas intéressant, Acheté)
+   ============================================================ */
+async function sendFeedback(id, fb) {
+  const prev = Store.feedback[id] || null;
+  if (fb) Store.feedback[id] = fb; else delete Store.feedback[id];
+  emit();
+  try {
+    await Api.post('/api/feedback', { id, statut: fb ? fb.statut : 'aucun', prix_achat: fb ? fb.prix_achat ?? null : null });
+    return true;
+  } catch (e) {
+    if (prev) Store.feedback[id] = prev; else delete Store.feedback[id];
+    emit();
+    toast('Avis non enregistré : ' + e.message);
+    return false;
+  }
+}
+async function setFeedback(id, val) {
+  const prev = Store.feedback[id] || null;
+  if (prev && prev.statut === val) {
+    if (await sendFeedback(id, null)) toast('Avis retiré : l’annonce est de nouveau à traiter', () => sendFeedback(id, prev));
+    return;
+  }
+  if (val === 'achete') { openBuyDialog(id, prev); return; }
+  if (await sendFeedback(id, { statut: val, at: Date.now() })) {
+    toast(val === 'interessant' ? 'Marquée intéressante' : 'Marquée pas intéressante', () => sendFeedback(id, prev));
+  }
+}
+function openBuyDialog(id, prev) {
+  const l = S.byId.get(id);
+  openDialog(`<h2 id="dlg-title">Marquer comme achetée</h2><p>${esc(l.titre || `${l.marque} ${l.modele}`)}, affichée ${esc(fmtEur(l.prix))}.</p>
+    <div class="field"><label for="buy-price">Prix payé</label><div class="iw"><input id="buy-price" class="input" inputmode="numeric" value="${l.prix ? esc(nf0.format(l.prix)) : ''}" style="padding-right:34px"><span class="unit">€</span></div>
+    <span class="help">Facultatif. Sert à mesurer la négociation obtenue dans le suivi.</span><span class="err-msg" id="buy-err" hidden></span></div>
+    <div class="actions"><button type="button" class="btn btn-ghost" data-action="dlg-cancel">Annuler</button><button type="button" class="btn btn-primary" data-action="buy-confirm" data-id="${esc(id)}">Marquer achetée</button></div>`,
+    w => { const i = $('#buy-price', w); i.focus(); i.select(); });
+  S.buyPrev = prev;
+}
+async function confirmBuy(id) {
+  const raw = $('#buy-price').value.trim();
+  let price = null;
+  if (raw) {
+    price = toInt(raw);
+    if (price == null || price <= 0) { const e = $('#buy-err'); e.hidden = false; e.textContent = 'Saisissez un montant en euros, ou laissez vide.'; return; }
+  }
+  const prev = S.buyPrev;
+  closeDialog();
+  if (await sendFeedback(id, { statut: 'achete', prix_achat: price, at: Date.now() })) {
+    S.stats = null;
+    toast('Marquée achetée', () => sendFeedback(id, prev));
+  }
+}
+
+/* ============================================================
+   Vues, événements, démarrage
+   ============================================================ */
+const VIEWS = {
+  opportunites: { render: renderFeed },
+  evaluer: { render: renderEvaluate, after: updateEvalResult },
+  annonces: { render: renderListings, after: () => loadList(false) },
+  suivi: { render: renderSuivi },
+  reglages: { render: renderSettings },
+};
+
+async function reloadFeed() {
+  try { await loadFeed(); S.loadError = null; } catch (e) { S.loadError = e.message; }
+  renderView();
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-action], [data-ev-seg]');
+  if (!t) return;
+  if (t.dataset.evSeg) {
+    S.ev[t.dataset.evSeg] = t.dataset.v;
+    t.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === t)));
+    onEvInput(); return;
+  }
+  const a = t.dataset.action, id = t.dataset.id;
+  switch (a) {
+    case 'login': doLogin(); break;
+    case 'logout': Api.post('/api/logout', {}).finally(() => showLogin()); break;
+    case 'reload': boot(); break;
+    case 'reload-config': loadConfig().then(() => { renderView(); toast('Réglages relus'); }).catch(err => toast(err.message)); break;
+    case 'open': S.sheetFromApp = true; location.hash = '#/annonce/' + encodeURIComponent(id); break;
+    case 'close-sheet': closeSheet(); break;
+    case 'fb': setFeedback(id, t.dataset.val); break;
+    case 'tab': S.feed.status = t.dataset.tab; renderView(); break;
+    case 'prio': S.feed.prioOnly = !S.feed.prioOnly; renderView(); break;
+    case 'period-30': S.feed.period = 30; reloadFeed(); break;
+    case 'toast-undo': if (toastUndo) { const u = toastUndo; toastUndo = null; u(); $('#toast').classList.remove('show'); } break;
+    case 'dlg-cancel': closeDialog(); break;
+    case 'buy-confirm': confirmBuy(id); break;
+    case 'list-statut': S.list.statut = t.dataset.k; loadList(false); break;
+    case 'list-more': S.list.offset += 50; loadList(true); break;
+    case 'list-clear': S.list.q = ''; renderView(); break;
+    case 'ev-clear': S.ev = emptyEvalForm(); renderView(); break;
+    case 'ev-save': saveEval(); break;
+    case 'ev-scroll': $('#eval-result').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); break;
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches('[data-action="period"]')) { S.feed.period = +t.value; reloadFeed(); }
+  else if (t.matches('[data-action="sort"]')) { S.feed.sort = t.value; renderView(); }
+  else if (t.matches('select[data-ev]')) { S.ev[t.dataset.ev] = t.value; onEvInput(); }
+});
+let listTimer = null;
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.matches('[data-ev]')) {
+    S.ev[t.dataset.ev] = t.value;
+    if (t.dataset.ev === 'marque') {
+      const dl = $('#dl-modeles');
+      if (dl) dl.innerHTML = [...new Set(MODELS.filter(m => strip(m.marque) === strip(t.value).trim()).map(m => m.modele))].map(m => `<option value="${esc(m)}">`).join('');
+    }
+    onEvInput();
+  } else if (t.matches('[data-list-q]')) {
+    S.list.q = t.value;
+    clearTimeout(listTimer); listTimer = setTimeout(() => loadList(false), 300);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (!$('#dialog').hidden) { closeDialog(); return; }
+    if (S.sheetId) closeSheet();
+  } else if (e.key === 'Enter') {
+    if (e.target.id === 'pwd') { e.preventDefault(); doLogin(); }
+    else if (e.target.id === 'buy-price') { e.preventDefault(); confirmBuy($('[data-action="buy-confirm"]').dataset.id); }
+  }
+});
+$('#scrim').addEventListener('click', () => closeSheet());
+$('#dialog').addEventListener('click', e => { if (e.target.id === 'dialog') closeDialog(); });
+window.addEventListener('hashchange', route);
+// Rafraîchit le fil toutes les 5 minutes quand l'onglet est visible.
+setInterval(() => { if (!document.hidden && S.loaded && S.view === 'opportunites' && !S.sheetId) reloadFeed(); }, 5 * 60 * 1000);
+
+boot();
+
+['opps','calc','list','chart','sliders'].forEach(k => { const el = document.getElementById('ico-' + k); if (el) el.outerHTML = ICON[k]; });
+
+</script>
+</body>
+</html>

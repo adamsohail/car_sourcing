@@ -1,0 +1,35 @@
+{
+ "listings": [
+  {
+   "listing_id": "2845123456",
+   "title": "Peugeot 208 1.2 PureTech 100 Allure",
+   "price_eur": 8900,
+   "city": "Lyon",
+   "postal_code": "69003",
+   "year": 2019,
+   "mileage_km": 72000,
+   "fuel": "Essence",
+   "gearbox": "Manuelle"
+  },
+  {
+   "listing_id": "2845123457",
+   "title": "Renault Clio IV dCi 90",
+   "price_eur": 6500,
+   "city": "Villeurbanne",
+   "postal_code": "69100",
+   "year": 2016,
+   "mileage_km": 118500,
+   "fuel": "Diesel"
+  },
+  {
+   "listing_id": "2845123458",
+   "price_eur": 11490,
+   "postal_code": "13005",
+   "year": 2018,
+   "mileage_km": 64300,
+   "fuel": "Hybride",
+   "gearbox": "Automatique"
+  }
+ ],
+ "unresolved_links": 0
+}

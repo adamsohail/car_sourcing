@@ -1,0 +1,76 @@
+[project]
+name = "car-sourcing"
+version = "0.1.0"
+description = "Sourcing de véhicules rentables à partir des alertes Leboncoin et La Centrale"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "httpx>=0.27",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.2",
+  "google-cloud-bigquery>=3.25",
+  "google-api-python-client>=2.140",
+  "google-auth>=2.34",
+  "fastapi>=0.114",
+  "uvicorn[standard]>=0.30",
+  "itsdangerous>=2.2",
+]
+
+[project.scripts]
+car-sourcing = "car_sourcing.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov>=5.0",
+  "ruff>=0.6",
+  "mypy>=1.11",
+  "pre-commit>=3.8",
+  "google-auth-oauthlib>=1.2",
+  "types-beautifulsoup4",
+  "httpx>=0.28.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/car_sourcing"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N", "S", "C4", "PT"]
+ignore = ["RUF001", "RUF002", "RUF003", "S101", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "N802"]
+"scripts/**" = ["S"]
+# Les f-strings n'injectent que des noms de tables et des fragments internes ; les valeurs passent par des paramètres.
+"src/car_sourcing/adapters/bigquery.py" = ["S608"]
+"src/car_sourcing/cli.py" = ["S608", "S104"]
+"src/car_sourcing/web/app.py" = ["S608"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["car_sourcing.domain.*", "car_sourcing.parsers.*"]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = ["bigquery: nécessite un dataset BigQuery de test (BQ_TEST_DATASET)"]
+
+[tool.coverage.run]
+source = ["src/car_sourcing"]
+branch = true

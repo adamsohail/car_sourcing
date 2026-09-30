@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sourcing auto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/*CSS*/
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/opportunites"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="1" transform="rotate(45 10 10)" fill="#fff" stroke="#1B1B1B" stroke-width="1.1"/><rect x="6.2" y="6.2" width="7.6" height="7.6" transform="rotate(45 10 10)" fill="#F5B800"/></svg>Sourcing auto</a>
+  <span data-slot="base" class="base-slot" style="margin-left:auto"></span>
+</header>
+<nav class="rail" aria-label="Navigation principale">
+  <a class="brand" href="#/opportunites"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="1" transform="rotate(45 10 10)" fill="#fff" stroke="#1B1B1B" stroke-width="1.1"/><rect x="6.2" y="6.2" width="7.6" height="7.6" transform="rotate(45 10 10)" fill="#F5B800"/></svg>Sourcing auto</a>
+  <div class="nav">
+    <a href="#/opportunites" data-view="opportunites"><span id="ico-opps"></span>Opportunités<span class="badge" id="nav-badge" hidden></span></a>
+    <a href="#/evaluer" data-view="evaluer"><span id="ico-calc"></span>Évaluer</a>
+    <a href="#/annonces" data-view="annonces"><span id="ico-list"></span>Annonces</a>
+    <a href="#/suivi" data-view="suivi"><span id="ico-chart"></span>Suivi</a>
+    <a href="#/reglages" data-view="reglages"><span id="ico-sliders"></span>Réglages</a>
+  </div>
+  <div class="rail-foot"><div data-slot="base"></div><div id="mode-line"></div></div>
+</nav>
+<main id="view"></main>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-head"></div>
+  <div class="sheet-body"></div>
+  <div class="sheet-foot"></div>
+</div>
+<div class="dialog-wrap" id="dialog" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/*JS*/
+</script>
+</body>
+</html>

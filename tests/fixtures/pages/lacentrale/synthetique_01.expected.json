@@ -1,0 +1,11 @@
+{
+ "brand": "Volkswagen",
+ "model": "Golf",
+ "year": 2018,
+ "mileage_km": 98200,
+ "fuel": "Diesel",
+ "price_eur": 12990,
+ "seller_type": "particulier",
+ "city": "Bordeaux",
+ "postal_code": "33000"
+}

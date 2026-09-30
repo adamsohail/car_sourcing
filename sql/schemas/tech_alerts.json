@@ -1,0 +1,17 @@
+[
+  {
+    "name": "kind",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "message",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "sent_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  }
+]

@@ -1,0 +1,15 @@
+{
+ "listings": [],
+ "unresolved_links": 1,
+ "resolved": {
+  "https://click.leboncoin.fr/ls/click?upn=abc2845999001": "https://www.leboncoin.fr/ad/voitures/2845999001"
+ },
+ "after_resolution": [
+  {
+   "listing_id": "2845999001",
+   "price_eur": 7200,
+   "postal_code": "44000",
+   "fuel": "GPL"
+  }
+ ]
+}

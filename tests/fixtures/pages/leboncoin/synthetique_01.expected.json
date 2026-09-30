@@ -1,0 +1,15 @@
+{
+ "brand": "Peugeot",
+ "model": "208",
+ "version": "1.2 PureTech 100 Allure",
+ "year": 2019,
+ "mileage_km": 72000,
+ "fuel": "Essence",
+ "gearbox": "Manuelle",
+ "price_eur": 8900,
+ "seller_type": "particulier",
+ "city": "Lyon",
+ "postal_code": "69003",
+ "lat": 45.7597,
+ "lon": 4.8611
+}

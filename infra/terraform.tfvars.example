@@ -1,0 +1,5 @@
+project_id        = "mon-projet-sourcing"
+region            = "europe-west1"
+sheet_id          = "1AbCdEf..."           # dans l'URL du Sheet, entre /d/ et /edit
+telegram_chat_id  = "-1001234567890"       # voir scripts/telegram_chat_id.sh
+github_repository = "mon-compte/car-sourcing"
