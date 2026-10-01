@@ -22,7 +22,7 @@ variable "dataset_id" {
 variable "sheet_id" {
   type        = string
   default     = ""
-  description = "Identifiant du Google Sheet de configuration (dans son URL, entre /d/ et /edit)."
+  description = "Inutilisé : les réglages se font dans l'interface. Conservé pour ne pas casser les anciens terraform.tfvars."
 }
 
 variable "telegram_chat_id" {

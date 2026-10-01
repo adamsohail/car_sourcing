@@ -1,51 +1,19 @@
-"""Google Sheets (configuration métier) et Telegram (alertes et boutons de retour)."""
+"""Telegram : alertes et boutons de retour."""
 
 from __future__ import annotations
 
 import logging
 from typing import Any
 
-import google.auth
 import httpx
-from googleapiclient.discovery import build
 
 from car_sourcing.adapters.ports import SentAlert
 from car_sourcing.alerts_format import alert_keyboard, format_alert
-from car_sourcing.domain.config import Config, parse_sheet
+from car_sourcing.domain.config import Config
 from car_sourcing.domain.models import Evaluation, Listing
 from car_sourcing.settings import Settings, log
 
 logger = logging.getLogger(__name__)
-SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-
-
-class SheetConfigSource:
-    """Lit les onglets `parametres` et `mots_cles_exclusion` avec le compte de service (lecture seule)."""
-
-    def __init__(self, settings: Settings) -> None:
-        creds, _ = google.auth.default(scopes=SHEETS_SCOPES)
-        self._api: Any = build("sheets", "v4", credentials=creds, cache_discovery=False)
-        self._sheet_id = settings.sheet_id
-
-    def rows(self) -> tuple[list[list[str]], list[list[str]]]:
-        resp = (
-            self._api.spreadsheets()
-            .values()
-            .batchGet(
-                spreadsheetId=self._sheet_id,
-                ranges=["parametres!A:B", "mots_cles_exclusion!A:A"],
-                valueRenderOption="FORMATTED_VALUE",
-            )
-            .execute()
-        )
-        ranges = resp.get("valueRanges", [])
-        params = ranges[0].get("values", []) if ranges else []
-        keywords = ranges[1].get("values", []) if len(ranges) > 1 else []
-        return params, keywords
-
-    def load(self) -> Config:
-        params, keywords = self.rows()
-        return parse_sheet(params, keywords)
 
 
 class TelegramNotifier:

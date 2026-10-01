@@ -5,7 +5,7 @@ output "service_url" {
 
 output "runtime_service_account" {
   value       = google_service_account.runtime.email
-  description = "À partager en lecture seule sur le Google Sheet de configuration."
+  description = "Compte de service du job et du service web."
 }
 
 output "image_repository" {

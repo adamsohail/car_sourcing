@@ -1,4 +1,4 @@
-"""Configuration métier, lue dans le Google Sheet et validée avant tout run.
+"""Configuration métier, saisie dans l'interface, versionnée dans BigQuery et validée avant tout run.
 
 Une valeur invalide lève `ConfigError` : le run s'arrête et une alerte technique part,
 plutôt que de filtrer avec une configuration fausse.
@@ -111,8 +111,8 @@ def _coerce(key: str, raw: str, errors: list[str]) -> object:
     return text
 
 
-def parse_sheet(param_rows: Sequence[Sequence[str]], keyword_rows: Iterable[Sequence[str]]) -> Config:
-    """Construit la configuration depuis les onglets `parametres` (clé, valeur) et `mots_cles_exclusion`."""
+def parse_rows(param_rows: Sequence[Sequence[str]], keyword_rows: Iterable[Sequence[str]]) -> Config:
+    """Construit la configuration depuis des lignes (clé, valeur) et une liste de mots-clés."""
     errors: list[str] = []
     values: dict[str, object] = {}
     for row in param_rows:
@@ -146,9 +146,11 @@ def parse_sheet(param_rows: Sequence[Sequence[str]], keyword_rows: Iterable[Sequ
     try:
         return Config.model_validate(values)
     except ValidationError as exc:
-        raise ConfigError(
-            [f"{'.'.join(str(p) for p in e['loc']) or 'config'} : {e['msg']}" for e in exc.errors()]
-        ) from exc
+        messages = []
+        for e in exc.errors():
+            where = ".".join(str(p) for p in e["loc"]) or "config"
+            messages.append(f"{where} : {str(e['msg']).removeprefix('Value error, ')}")
+        raise ConfigError(messages) from exc
 
 
 DEFAULT_PARAMETERS: list[tuple[str, str]] = [
@@ -179,3 +181,52 @@ DEFAULT_KEYWORDS: list[str] = [
     "boîte HS",
     "joint de culasse",
 ]
+
+
+NO_CONFIG_MESSAGE = (
+    "aucun réglage enregistré : ouvrez la page Réglages de l'interface et enregistrez-les une première fois"
+)
+
+
+def _as_text(value: object) -> str:
+    if isinstance(value, bool):
+        return "VRAI" if value else "FAUX"
+    if value is None:
+        return ""
+    return str(value)
+
+
+def config_from_payload(payload: dict[str, object]) -> Config:
+    """Valide les réglages envoyés par l'interface ou relus dans BigQuery : {params: {...}, keywords: [...]}."""
+    params = payload.get("params")
+    keywords = payload.get("keywords")
+    if not isinstance(params, dict) or not isinstance(keywords, list):
+        raise ConfigError(["config : format attendu {params, keywords}"])
+    rows = [(str(k), _as_text(v)) for k, v in params.items()]
+    return parse_rows(rows, [[str(k)] for k in keywords])
+
+
+def payload_from_config(config: Config) -> dict[str, object]:
+    data = config.model_dump(mode="json")
+    keywords = data.pop("mots_cles_exclusion")
+    return {"params": data, "keywords": keywords}
+
+
+def errors_by_field(errors: Sequence[str]) -> dict[str, str]:
+    """« taux_frais_pct : … » -> {"taux_frais_pct": "…"} ; les erreurs générales vont sous « config »."""
+    out: dict[str, str] = {}
+    for error in errors:
+        key, sep, message = error.partition(" : ")
+        if not sep:
+            out.setdefault("config", error)
+            continue
+        for field in [*_FIELD_KINDS, "mots_cles_exclusion"]:
+            if key == field or key.startswith(field):
+                out.setdefault(field, message)
+                break
+        else:
+            # Erreurs de cohérence (« prix_max_eur doit être supérieur… ») : le champ cité en premier.
+            found = sorted((message.find(f), f) for f in _FIELD_KINDS if f in message)
+            field = found[0][1] if found else "config"
+            out.setdefault(field, message)
+    return out

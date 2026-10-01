@@ -1,0 +1,7 @@
+[
+  {"name": "number", "type": "INT64", "mode": "REQUIRED", "description": "Numéro de version, croissant"},
+  {"name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "author", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "config_hash", "type": "STRING", "mode": "REQUIRED", "description": "Empreinte enregistrée avec chaque évaluation"},
+  {"name": "payload", "type": "STRING", "mode": "REQUIRED", "description": "JSON {params, keywords}"}
+]

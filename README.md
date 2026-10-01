@@ -14,7 +14,7 @@ Toutes les 10 minutes, un job Cloud Run :
 2. extrait les annonces et ignore celles déjà vues (sauf changement de prix) ;
 3. ouvre la page de chaque nouvelle annonce, avec 3 à 6 secondes entre deux requêtes. Si la page est
    inaccessible, l'annonce est évaluée avec les seules données de l'email et marquée « détail indisponible » ;
-4. applique les filtres du Google Sheet, calcule la cote (médiane des comparables) et la marge ;
+4. applique les filtres de la dernière version des réglages, calcule la cote (médiane des comparables) et la marge ;
 5. enregistre tout dans BigQuery, alerte sur Telegram, puis pose le label `traite` sur l'email.
 
 Toutes les annonces sont conservées, filtrées ou non : elles forment la cote de marché.
@@ -22,18 +22,20 @@ Un service Cloud Run reçoit les clics Telegram et sert l'interface, protégée 
 
 ## Régler l'outil
 
-Tout se règle dans le **Google Sheet**, sans code : onglet `parametres` (seuils, frais, transport, base) et onglet
-`mots_cles_exclusion` (un mot-clé par ligne). Les changements sont pris en compte au run suivant. Une valeur
-invalide suspend les alertes et envoie une alerte technique qui nomme le champ en cause.
+Tout se règle dans la page **Réglages** de l'interface, sans code : filtres, frais, transport, base, seuils d'alerte,
+paramètres de la cote et mots-clés d'exclusion. Chaque valeur est contrôlée à la saisie, un aperçu estime le nombre
+d'alertes sur 7 jours avant d'enregistrer, et chaque enregistrement crée une version conservée dans BigQuery
+(table `config_versions`). Le job lit la dernière version à chaque run ; chaque évaluation garde l'empreinte de la
+version utilisée.
 
-Après 2 à 4 semaines, la page **Suivi** de l'interface aide à ajuster les seuils : entonnoir des annonces, motifs
-d'exclusion et remise réellement obtenue à l'achat, à comparer avec la décote de revente.
+Après 2 à 4 semaines, la page **Suivi** aide à ajuster les seuils : entonnoir des annonces, motifs d'exclusion et
+remise réellement obtenue à l'achat, à comparer avec la décote de revente.
 
 ## Alertes techniques (Telegram, au plus une toutes les 6 h par type)
 
 | Message | Que faire |
 | --- | --- |
-| Google Sheet invalide | Corriger la valeur indiquée dans le Sheet. |
+| Réglages invalides ou absents | Ouvrir la page Réglages et enregistrer une version valide (lien dans l'alerte). |
 | Échecs de parsing au-delà de 20 % | Un site a changé le format de ses emails ou pages : ajouter l'email en fixture (voir l'installation, étape 10) et adapter le parser. Les emails illisibles portent le label `erreur_parsing`. |
 | Aucun email depuis 24 h | Vérifier que les alertes Leboncoin et La Centrale sont actives et arrivent sur le compte dédié. |
 | Run en échec | Lire l'erreur dans Cloud Logging (ressource « Cloud Run Job », `car-sourcing-ingest`). |
@@ -45,7 +47,7 @@ make install          # dépendances et hooks pre-commit
 make check            # lint, typage, tests
 uv run car-sourcing demo            # interface avec des annonces simulées, mot de passe « demo »
 uv run car-sourcing run             # un run d'ingestion (avec un fichier .env, DRY_RUN=true conseillé)
-uv run car-sourcing smoke           # vérifie BigQuery, Sheet, Gmail, géocodage et Telegram
+uv run car-sourcing smoke           # vérifie BigQuery, réglages, Gmail, géocodage et Telegram
 uv run car-sourcing test-alert      # envoie une alerte de test
 python web/build.py                 # reconstruit l'interface après modification de web/
 ```
@@ -58,7 +60,7 @@ Dans GCP, les mêmes commandes passent par le job : `gcloud run jobs execute car
 src/car_sourcing/
   domain/        règles pures : configuration, filtres, cote, marge, niveaux (testées à 94 %)
   parsers/       emails et pages Leboncoin et La Centrale
-  adapters/      Gmail, HTTP, BigQuery, Sheets, Telegram, géocodage IGN
+  adapters/      Gmail, HTTP, BigQuery (dont les réglages versionnés), Telegram, géocodage IGN
   pipeline.py    orchestration d'un run et supervision
   web/           service web : webhook Telegram, API, interface (static/index.html)
   demo.py        données simulées pour `car-sourcing demo`

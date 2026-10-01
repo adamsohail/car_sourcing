@@ -118,7 +118,8 @@ function renderFeed() {
   const { items, todo, byFb, prioCount } = feedData();
   const notes = [];
   if (S.cfgErrors) {
-    notes.push(`<div class="note stop" role="alert">${ICON.stop}<div class="note-body"><strong>Google Sheet invalide : aucune alerte n’est calculée.</strong><ul class="err-list">${S.cfgErrors.map(e => `<li>${esc(e)}</li>`).join('')}</ul>${Store.sheetUrl ? `<div class="note-actions"><a class="btn btn-ghost btn-sm" href="${esc(Store.sheetUrl)}" target="_blank" rel="noopener">Corriger dans le Google Sheet</a></div>` : ''}</div></div>`);
+    const first = !S.cfgMeta;
+    notes.push(`<div class="note ${first ? 'warn' : 'stop'}" role="alert">${first ? ICON.sliders : ICON.stop}<div class="note-body"><strong>${first ? 'Enregistrez vos réglages pour démarrer.' : 'Réglages invalides : aucune alerte n’est calculée.'}</strong> ${first ? 'Le job attend une première version, avec au moins le code postal de votre base.' : ''}${first ? '' : `<ul class="err-list">${S.cfgErrors.map(e => `<li>${esc(e)}</li>`).join('')}</ul>`}<div class="note-actions"><a class="btn btn-primary btn-sm" href="#/reglages">Ouvrir les réglages</a></div></div></div>`);
   }
   const tabs = [['todo', 'À traiter', todo.length], ['interessant', 'Intéressantes', byFb.interessant.length], ['achete', 'Achetées', byFb.achete.length], ['pas_interessant', 'Pas intéressantes', byFb.pas_interessant.length]];
   let lede;

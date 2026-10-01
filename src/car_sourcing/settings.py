@@ -1,4 +1,4 @@
-"""Configuration technique par variables d'environnement (la configuration métier vient du Sheet)."""
+"""Configuration technique par variables d'environnement (les réglages métier sont saisis dans l'interface)."""
 
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     gcp_project: str = ""
     bq_dataset: str = "car_sourcing"
     bq_location: str = "EU"
-    sheet_id: str = ""
 
     gmail_oauth_json: SecretStr | None = None
     gmail_query: str = "(from:leboncoin.fr OR from:lacentrale.fr) -label:traite -label:erreur_parsing"

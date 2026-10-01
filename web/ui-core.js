@@ -59,11 +59,12 @@ function carSVG(l) {
 
 /* ---------- API du service ---------- */
 class ApiError extends Error {
-  constructor(status, message) { super(message); this.status = status; }
+  constructor(status, message, data) { super(message); this.status = status; this.data = data; }
 }
 function detailText(d) {
   if (!d) return 'Erreur inattendue du serveur.';
   if (typeof d === 'string') return d;
+  if (Array.isArray(d.messages)) return d.messages.join(' ; ');
   if (Array.isArray(d.errors)) return d.errors.join(' ; ');
   if (Array.isArray(d)) return d.map(x => x.msg || String(x)).join(' ; ');
   return JSON.stringify(d);
@@ -78,7 +79,7 @@ const Api = {
     }
     const data = await res.json().catch(() => ({}));
     if (res.status === 401 && path !== '/api/login') { showLogin(); throw new ApiError(401, 'Connexion requise.'); }
-    if (!res.ok) throw new ApiError(res.status, detailText(data.detail));
+    if (!res.ok) throw new ApiError(res.status, detailText(data.detail), data.detail);
     return data;
   },
   get(path) { return this.req(path); },
@@ -86,7 +87,7 @@ const Api = {
 };
 
 /* ---------- État ---------- */
-const Store = { feedback: {}, sheetUrl: null };
+const Store = { feedback: {} };
 const S = {
   feedItems: [], byId: new Map(), evals: new Map(), detail: {}, cfgUsed: defaultConfig(), cfgErrors: null,
   ctx: { kwList: kwList(DEFAULT_KEYWORDS) }, loaded: false, loadError: null,
@@ -94,6 +95,7 @@ const S = {
   feed: { status: 'todo', period: 7, prioOnly: false, sort: 'marge' },
   list: { q: '', statut: 'all', offset: 0, items: [], counts: {}, total: 0, loading: false, error: null },
   stats: null, statsError: null, ev: null,
+  cfgMeta: null, cfgDraftSource: null, draft: null, dirty: false, fieldErrors: {}, preview: null, saving: false,
 };
 const EMPTY_EV = { statut: 'non_evaluee', n: 0, comps: [], motif: null, niveau: null, cote: null, marge: null };
 
@@ -109,7 +111,8 @@ function ingest(items) {
 }
 async function loadConfig() {
   const r = await Api.get('/api/config');
-  Store.sheetUrl = r.sheetUrl;
+  S.cfgMeta = r.meta;
+  S.cfgDraftSource = r.draft;
   S.cfgErrors = r.errors && r.errors.length ? r.errors : null;
   S.cfgUsed = r.config ? { params: r.config.params, keywords: r.config.keywords, version: r.config.version } : defaultConfig();
   S.ctx = { kwList: kwList(S.cfgUsed.keywords) };
@@ -207,6 +210,7 @@ function refresh() {
   if (!S.view) return;
   if (S.view === 'evaluer') updateEvalResult();
   else if (S.view === 'annonces') updateList();
+  else if (S.view === 'reglages') { if (!S.dirty) renderView(); }
   else { const y = window.scrollY; renderView(); window.scrollTo(0, y); }
   if (S.sheetId) renderSheet();
 }

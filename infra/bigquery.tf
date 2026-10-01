@@ -1,11 +1,12 @@
 locals {
   tables = {
-    listings      = { partition = null, clustering = ["source", "brand_norm", "model_norm"] }
-    evaluations   = { partition = "evaluated_at", clustering = ["source", "listing_id"] }
-    alerts        = { partition = "sent_at", clustering = ["source", "listing_id"] }
-    feedback      = { partition = "created_at", clustering = ["source", "listing_id"] }
-    geocode_cache = { partition = null, clustering = ["postal_code"] }
-    tech_alerts   = { partition = null, clustering = ["kind"] }
+    listings        = { partition = null, clustering = ["source", "brand_norm", "model_norm"] }
+    evaluations     = { partition = "evaluated_at", clustering = ["source", "listing_id"] }
+    alerts          = { partition = "sent_at", clustering = ["source", "listing_id"] }
+    feedback        = { partition = "created_at", clustering = ["source", "listing_id"] }
+    geocode_cache   = { partition = null, clustering = ["postal_code"] }
+    tech_alerts     = { partition = null, clustering = ["kind"] }
+    config_versions = { partition = null, clustering = ["number"] }
   }
   # Ordre de création : chaque vue dépend des précédentes.
   views = ["v_latest_evaluation", "v_latest_feedback", "v_listing_status"]

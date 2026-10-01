@@ -1,6 +1,6 @@
 # Installation pas à pas
 
-Comptez environ deux heures la première fois. Chaque étape se termine par une vérification.
+Comptez environ une heure et demie la première fois. Chaque étape se termine par une vérification.
 Les commandes sont à lancer depuis la racine du dépôt, sur un poste avec `gcloud`, `terraform` (1.6 ou plus),
 `uv` et `git` installés.
 
@@ -25,15 +25,6 @@ gcloud auth login
 gcloud auth application-default login
 ```
 
-## 3. Le Google Sheet de configuration
-
-1. Dans Google Drive : Nouveau > Importer, choisissez `templates/configuration_sourcing.xlsx`,
-   puis ouvrez-le avec Google Sheets (Fichier > Enregistrer au format Google Sheets).
-2. Renseignez au minimum `base_code_postal`, et confirmez `taux_frais_pct` et `cout_transport_eur_km`.
-3. Notez l'identifiant du Sheet : dans l'URL, la partie entre `/d/` et `/edit`.
-
-Tant que la base est vide, le run est bloqué et une alerte technique l'explique : c'est voulu.
-
 ## 4. Le bot Telegram
 
 1. Dans Telegram, écrivez à **@BotFather** : `/newbot`, puis gardez le token affiché (il ne doit être collé nulle part
@@ -50,13 +41,12 @@ Faites-le avant l'étape 8 : une fois le webhook enregistré, cette méthode ne 
 ## 5. L'infrastructure
 
 ```bash
-cp infra/terraform.tfvars.example infra/terraform.tfvars   # puis complétez les 5 valeurs
+cp infra/terraform.tfvars.example infra/terraform.tfvars   # puis complétez les 4 valeurs
 scripts/bootstrap.sh <project_id> europe-west1
 ```
 
 Le script crée le bucket d'état Terraform, puis toute l'infrastructure. À la fin, il affiche :
 
-- `runtime_service_account` : partagez le Google Sheet **en lecture** avec cette adresse (bouton Partager) ;
 - `service_url` : l'adresse de l'interface ;
 - `workload_identity_provider` et `deployer_service_account` : pour l'étape 7.
 
@@ -113,7 +103,16 @@ uv run car-sourcing set-webhook "$(terraform -chdir=infra output -raw service_ur
 
 La réponse doit contenir `"ok": true`.
 
-## 9. Vérifications
+## 9. Les réglages
+
+Ouvrez `service_url`, connectez-vous avec le mot de passe de l'étape 6, puis ouvrez **Réglages**. Vérifiez les
+valeurs, renseignez au moins le **code postal de votre base**, confirmez le taux de frais et le coût au kilomètre,
+puis enregistrez. Tant qu'aucune version n'est enregistrée, le job s'arrête et envoie une alerte technique : c'est voulu.
+
+Chaque enregistrement crée une version (table `config_versions`) et s'applique au run suivant. Une valeur invalide est
+refusée avant d'être enregistrée ; si deux personnes modifient en même temps, la seconde est invitée à recharger.
+
+## 10. Vérifications
 
 Les commandes suivantes s'exécutent dans GCP, avec les vrais secrets :
 
@@ -131,9 +130,9 @@ Correspondance avec les critères de validation du plan :
 | 4. Infrastructure | second `terraform plan` vide ; `BQ_TEST_PROJECT=<projet> BQ_TEST_DATASET=car_sourcing_test uv run pytest -m bigquery` vert |
 | 5. Pipeline | après un run, des lignes dans `listings` et `evaluations`, les emails portent le label `traite` ; un second run n'ajoute aucun doublon |
 | 6. Telegram | `test-alert` envoie une alerte ; chaque bouton crée une ligne dans `feedback` et coche le bouton |
-| 7. Production | 24 h de runs sans erreur dans Cloud Logging ; chaque alerte technique déclenchée une fois (par exemple en vidant temporairement `base_code_postal` dans le Sheet) |
+| 7. Production | 24 h de runs sans erreur dans Cloud Logging ; chaque alerte technique reçue une fois (l'alerte « réglages » arrive d'elle-même tant qu'aucune version n'est enregistrée) |
 
-## 10. Valider les parsers sur de vrais emails
+## 11. Valider les parsers sur de vrais emails
 
 Les exemples fournis dans `tests/fixtures` sont synthétiques. Dès que les premières alertes arrivent :
 

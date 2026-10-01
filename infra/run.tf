@@ -7,7 +7,6 @@ locals {
     GCP_PROJECT      = var.project_id
     BQ_DATASET       = var.dataset_id
     BQ_LOCATION      = var.bq_location
-    SHEET_ID         = var.sheet_id
     TELEGRAM_CHAT_ID = var.telegram_chat_id
     PUBLIC_BASE_URL  = local.service_url
   }

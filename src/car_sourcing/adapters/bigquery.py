@@ -14,7 +14,7 @@ from typing import Any
 
 from google.cloud import bigquery
 
-from car_sourcing.domain.config import Config
+from car_sourcing.domain.config import NO_CONFIG_MESSAGE, Config, ConfigError, config_from_payload
 from car_sourcing.domain.models import AlertLevel, Comparable, Evaluation, FeedbackStatus, Listing, Source
 from car_sourcing.domain.rules import PreviousAlert
 
@@ -208,6 +208,41 @@ class BigQueryRepository:
             "tech_alerts", [{"kind": kind, "message": message[:1000], "sent_at": sent_at.isoformat()}]
         )
 
+    # ---------- Réglages versionnés ----------
+
+    def latest_config(self) -> dict[str, Any] | None:
+        rows = self._query(
+            f"SELECT * FROM {self.table('config_versions')} ORDER BY number DESC, created_at DESC LIMIT 1"
+        )
+        if not rows:
+            return None
+        row = rows[0]
+        row["payload"] = json.loads(row["payload"])
+        return row
+
+    def insert_config(
+        self, number: int, payload: dict[str, Any], config_hash: str, author: str | None, created_at: datetime
+    ) -> None:
+        self._insert(
+            "config_versions",
+            [
+                {
+                    "number": number,
+                    "created_at": created_at.isoformat(),
+                    "author": author,
+                    "config_hash": config_hash,
+                    "payload": json.dumps(payload, ensure_ascii=False),
+                }
+            ],
+        )
+
+    def recent_for_preview(self, since: datetime) -> list[dict[str, Any]]:
+        """Annonces récentes avec la cote et la distance de leur dernière évaluation (aperçu des réglages)."""
+        return self._query(
+            f"SELECT * FROM {self.table('v_listing_status')} WHERE first_seen_at >= @since LIMIT 5000",
+            [bigquery.ScalarQueryParameter("since", "TIMESTAMP", since)],
+        )
+
     # ---------- Cache de géocodage ----------
 
     def get_geocode(self, postal_code: str, city: str) -> tuple[float, float] | None:
@@ -319,3 +354,16 @@ class BigQueryRepository:
             "feedback": feedback,
             "purchases": purchases,
         }
+
+
+class StoredConfigSource:
+    """Lit la dernière version des réglages enregistrée depuis l'interface."""
+
+    def __init__(self, repo: BigQueryRepository) -> None:
+        self._repo = repo
+
+    def load(self) -> Config:
+        row = self._repo.latest_config()
+        if row is None:
+            raise ConfigError([NO_CONFIG_MESSAGE])
+        return config_from_payload(row["payload"])

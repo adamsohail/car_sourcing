@@ -120,8 +120,14 @@ class Pipeline:
             config = self.config_source.load()
         except ConfigError as exc:
             self.technical_alert(
-                "sheet_invalide",
-                "Google Sheet invalide, aucune annonce traitée :\n- " + "\n- ".join(exc.errors),
+                "reglages_invalides",
+                "Réglages invalides ou absents, aucune annonce traitée :\n- "
+                + "\n- ".join(exc.errors)
+                + (
+                    f"\nÀ corriger dans la page Réglages : {self.s.public_base_url}/#/reglages"
+                    if self.s.public_base_url
+                    else ""
+                ),
             )
             raise
         base = self.geocoder.geocode(config.base_code_postal, None)

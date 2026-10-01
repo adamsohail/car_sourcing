@@ -236,3 +236,24 @@ def evaluate(
             "alert_level": alert_level(breakdown.margin_eur, config),
         }
     )
+
+
+def reprice(
+    listing: Listing,
+    market_price_eur: float | None,
+    distance_km: float | None,
+    config: Config,
+    current_year: int,
+) -> AlertLevel | None:
+    """Niveau d'alerte d'une annonce déjà évaluée, recalculé avec d'autres réglages.
+
+    Sert à l'aperçu d'impact des réglages : la cote enregistrée est réutilisée telle quelle
+    (les changements de comparables_min ou de fenêtre ne sont donc pas pris en compte).
+    """
+    if not apply_filters(listing, config, current_year).passed or market_price_eur is None:
+        return None
+    assert listing.price_eur is not None
+    margin = MARGIN_CALCULATORS[config.regime_fiscal].compute(
+        market_price_eur, listing.price_eur, distance_km or 0.0, config
+    )
+    return alert_level(margin.margin_eur, config)

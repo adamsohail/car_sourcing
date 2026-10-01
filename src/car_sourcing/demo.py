@@ -11,7 +11,16 @@ from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from car_sourcing.domain.config import DEFAULT_KEYWORDS, DEFAULT_PARAMETERS, Config, parse_sheet
+from car_sourcing.domain.config import (
+    DEFAULT_KEYWORDS,
+    DEFAULT_PARAMETERS,
+    NO_CONFIG_MESSAGE,
+    Config,
+    ConfigError,
+    config_from_payload,
+    parse_rows,
+    payload_from_config,
+)
 from car_sourcing.domain.models import (
     Comparable,
     EnrichmentStatus,
@@ -64,7 +73,7 @@ PHOTO = None
 def demo_config() -> Config:
     params = dict(DEFAULT_PARAMETERS)
     params["base_code_postal"] = "69003"
-    return parse_sheet(list(params.items()), [[k] for k in DEFAULT_KEYWORDS])
+    return parse_rows(list(params.items()), [[k] for k in DEFAULT_KEYWORDS])
 
 
 class DemoGeocoder:
@@ -85,6 +94,33 @@ class DemoRepository:
         self.listings: dict[str, Listing] = {}
         self.evals: dict[str, Evaluation] = {}
         self.feedback: dict[str, tuple[FeedbackStatus, int | None, datetime]] = {}
+        self.configs: list[dict[str, Any]] = []
+
+    # --- réglages ---
+    def latest_config(self) -> dict[str, Any] | None:
+        return self.configs[-1] if self.configs else None
+
+    def insert_config(
+        self, number: int, payload: dict[str, Any], config_hash: str, author: str | None, created_at: datetime
+    ) -> None:
+        self.configs.append(
+            {
+                "number": number,
+                "payload": payload,
+                "config_hash": config_hash,
+                "author": author,
+                "created_at": created_at,
+            }
+        )
+
+    def load_config(self) -> Config:
+        row = self.latest_config()
+        if row is None:
+            raise ConfigError([NO_CONFIG_MESSAGE])
+        return config_from_payload(row["payload"])
+
+    def recent_for_preview(self, since: datetime) -> list[dict[str, Any]]:
+        return [self._row(x) for x in self.listings.values() if x.first_seen_at >= since]
 
     # --- pipeline ---
     def get_listing(self, source: Source, listing_id: str) -> Listing | None:
@@ -255,6 +291,7 @@ class DemoRepository:
 def seed(repo: DemoRepository, config: Config, n: int = 1100, now: datetime | None = None) -> None:
     rng = random.Random(20260926)  # noqa: S311 - données de démonstration
     now = now or datetime.now(UTC)
+    repo.insert_config(1, payload_from_config(config), config.version, "démo", now)
     base = (45.759, 4.861)
     damaged = [
         "Vendue pour pièces, moteur HS.",

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from car_sourcing.domain.config import DEFAULT_KEYWORDS, DEFAULT_PARAMETERS, ConfigError, parse_sheet
+from car_sourcing.domain.config import DEFAULT_KEYWORDS, DEFAULT_PARAMETERS, ConfigError, parse_rows
 from car_sourcing.domain.text import find_keyword, normalize, normalize_fuel, normalize_gearbox, parse_int
 from tests.conftest import make_config
 
@@ -48,7 +48,7 @@ class TestSheet:
 
     def test_base_manquante_rejetee(self) -> None:
         with pytest.raises(ConfigError, match="base_code_postal"):
-            parse_sheet(DEFAULT_PARAMETERS, [])
+            parse_rows(DEFAULT_PARAMETERS, [])
 
     @pytest.mark.parametrize(
         ("key", "value", "message"),
@@ -71,7 +71,7 @@ class TestSheet:
         rows = [r for r in DEFAULT_PARAMETERS if r[0] not in {"km_max", "base_code_postal"}]
         rows += [("base_code_postal", "69003"), ("inconnu", "1")]
         with pytest.raises(ConfigError) as exc:
-            parse_sheet(rows, [])
+            parse_rows(rows, [])
         assert any("km_max" in e for e in exc.value.errors)
         assert any("inconnu" in e for e in exc.value.errors)
 
@@ -81,5 +81,5 @@ class TestSheet:
             *[r for r in DEFAULT_PARAMETERS if r[0] != "base_code_postal"],
             ("base_code_postal", "69003"),
         ]
-        cfg = parse_sheet(rows, [["mot-clé"], ["Épave"], ["epave"], [""], []])
+        cfg = parse_rows(rows, [["mot-clé"], ["Épave"], ["epave"], [""], []])
         assert cfg.mots_cles_exclusion == ("Épave",)

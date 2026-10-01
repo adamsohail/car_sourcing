@@ -8,7 +8,6 @@ locals {
     "iamcredentials.googleapis.com",
     "run.googleapis.com",
     "secretmanager.googleapis.com",
-    "sheets.googleapis.com",
     "sts.googleapis.com",
   ]
 }

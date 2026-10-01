@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from car_sourcing.domain.config import DEFAULT_KEYWORDS, DEFAULT_PARAMETERS, Config, parse_sheet
+from car_sourcing.domain.config import DEFAULT_KEYWORDS, DEFAULT_PARAMETERS, Config, parse_rows
 from car_sourcing.domain.models import Listing, SellerType, Source
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -16,7 +16,7 @@ def make_config(**overrides: str) -> Config:
     params = dict(DEFAULT_PARAMETERS)
     params["base_code_postal"] = "69003"
     params.update(overrides)
-    return parse_sheet(list(params.items()), [[k] for k in DEFAULT_KEYWORDS])
+    return parse_rows(list(params.items()), [[k] for k in DEFAULT_KEYWORDS])
 
 
 @pytest.fixture

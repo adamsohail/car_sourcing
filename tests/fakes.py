@@ -88,6 +88,26 @@ class FakeRepo:
     alerts: list[tuple[str, AlertLevel, int | None, datetime]] = field(default_factory=list)
     feedback: list[tuple[str, FeedbackStatus, int | None]] = field(default_factory=list)
     tech: list[tuple[str, datetime]] = field(default_factory=list)
+    configs: list[dict] = field(default_factory=list)
+
+    def latest_config(self) -> dict | None:
+        return self.configs[-1] if self.configs else None
+
+    def insert_config(
+        self, number: int, payload: dict, config_hash: str, author: str | None, created_at: datetime
+    ) -> None:
+        self.configs.append(
+            {
+                "number": number,
+                "payload": payload,
+                "config_hash": config_hash,
+                "author": author,
+                "created_at": created_at,
+            }
+        )
+
+    def recent_for_preview(self, since: datetime) -> list[dict]:
+        return []
 
     def get_listing(self, source: Source, listing_id: str) -> Listing | None:
         return self.listings.get(f"{source.value}:{listing_id}")

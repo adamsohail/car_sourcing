@@ -1,4 +1,4 @@
-"""Points d'entrée : `run` (job planifié), `serve` (service web), `smoke`, `set-webhook`, `init-sheet`."""
+"""Points d'entrée : `run` (job planifié), `serve` (service web), `smoke`, `set-webhook`, `test-alert`, `demo`."""
 
 from __future__ import annotations
 
@@ -21,8 +21,9 @@ def _repo() -> BigQueryRepository:
 
 
 def cmd_run() -> int:
+    from car_sourcing.adapters.bigquery import StoredConfigSource
     from car_sourcing.adapters.external import GmailSource, IgnGeocoder, PoliteFetcher
-    from car_sourcing.adapters.messaging import SheetConfigSource, TelegramNotifier
+    from car_sourcing.adapters.messaging import TelegramNotifier
     from car_sourcing.domain.config import ConfigError
     from car_sourcing.pipeline import Pipeline
 
@@ -34,7 +35,7 @@ def cmd_run() -> int:
         mail=GmailSource(s),
         fetcher=PoliteFetcher(s),
         repo=repo,
-        config_source=SheetConfigSource(s),
+        config_source=StoredConfigSource(repo),
         geocoder=IgnGeocoder(repo),
         notifier=notifier,
     )
@@ -53,19 +54,19 @@ def cmd_run() -> int:
 
 
 def build_web_app():  # type: ignore[no-untyped-def]
+    from car_sourcing.adapters.bigquery import StoredConfigSource
     from car_sourcing.adapters.external import IgnGeocoder
-    from car_sourcing.adapters.messaging import SheetConfigSource, TelegramNotifier
+    from car_sourcing.adapters.messaging import TelegramNotifier
     from car_sourcing.web.app import Deps, create_app
 
     s = get_settings()
     repo = _repo()
-    sheet = SheetConfigSource(s)
     return create_app(
         Deps(
             settings=s,
             repo=repo,
             telegram=TelegramNotifier(s),
-            config_loader=sheet.load,
+            config_loader=StoredConfigSource(repo).load,
             geocoder=IgnGeocoder(repo),
         )
     )
@@ -99,7 +100,6 @@ def cmd_demo(port: int) -> int:
         web_password=SecretStr("demo"),
         session_secret=SecretStr("demo-" * 8),
         cookie_secure=False,
-        sheet_id="",
     )
     repo = DemoRepository()
     seed(repo, demo_config())
@@ -108,7 +108,7 @@ def cmd_demo(port: int) -> int:
             settings=settings,
             repo=repo,
             telegram=DemoTelegram(),
-            config_loader=demo_config,
+            config_loader=repo.load_config,
             geocoder=DemoGeocoder(),
         )
     )
@@ -119,8 +119,9 @@ def cmd_demo(port: int) -> int:
 
 def cmd_smoke() -> int:
     """Vérifie chaque dépendance externe ; à lancer après chaque déploiement."""
+    from car_sourcing.adapters.bigquery import StoredConfigSource
     from car_sourcing.adapters.external import GmailSource, IgnGeocoder
-    from car_sourcing.adapters.messaging import SheetConfigSource, TelegramNotifier
+    from car_sourcing.adapters.messaging import TelegramNotifier
 
     s = get_settings()
     checks: list[tuple[str, bool, str]] = []
@@ -135,7 +136,7 @@ def cmd_smoke() -> int:
     check(
         "BigQuery", lambda: f"{len(repo._query(f'SELECT 1 FROM {repo.table("listings")} LIMIT 1'))} ligne lue"
     )
-    check("Google Sheet", lambda: f"config version {SheetConfigSource(s).load().version}")
+    check("Réglages", lambda: f"version {StoredConfigSource(repo).load().version}")
     check("Gmail", lambda: f"dernier email d'alerte : {GmailSource(s).latest_alert_email_at()}")
     check("Géocodage", lambda: IgnGeocoder(repo).geocode("69003", "Lyon"))
     check("Telegram", lambda: TelegramNotifier(s).call("getMe")["result"]["username"])
@@ -163,7 +164,8 @@ def cmd_set_webhook(url: str) -> int:
 
 def cmd_test_alert() -> int:
     """Envoie une alerte de démonstration sur Telegram (validation de l'étape 6)."""
-    from car_sourcing.adapters.messaging import SheetConfigSource, TelegramNotifier
+    from car_sourcing.adapters.bigquery import StoredConfigSource
+    from car_sourcing.adapters.messaging import TelegramNotifier
     from car_sourcing.domain.models import AlertLevel, Evaluation, Listing, Reliability, Source
 
     s = get_settings()
@@ -197,7 +199,7 @@ def cmd_test_alert() -> int:
         alert_level=AlertLevel.PRIORITAIRE,
         price_eur=8900,
     )
-    print(TelegramNotifier(s).send_alert(listing, ev, SheetConfigSource(s).load()))
+    print(TelegramNotifier(s).send_alert(listing, ev, StoredConfigSource(_repo()).load()))
     return 0
 
 

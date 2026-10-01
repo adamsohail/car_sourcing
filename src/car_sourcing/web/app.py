@@ -24,9 +24,24 @@ from itsdangerous import BadSignature, SignatureExpired, TimestampSigner
 from pydantic import BaseModel, Field
 
 from car_sourcing.alerts_format import PRICE_PROMPT_RE, decode_callback, price_prompt
-from car_sourcing.domain.config import Config, ConfigError
-from car_sourcing.domain.models import EnrichmentStatus, FeedbackStatus, Listing, SellerType, Source
-from car_sourcing.domain.rules import evaluate, market_price
+from car_sourcing.domain.config import (
+    DEFAULT_KEYWORDS,
+    DEFAULT_PARAMETERS,
+    Config,
+    ConfigError,
+    config_from_payload,
+    errors_by_field,
+    payload_from_config,
+)
+from car_sourcing.domain.models import (
+    AlertLevel,
+    EnrichmentStatus,
+    FeedbackStatus,
+    Listing,
+    SellerType,
+    Source,
+)
+from car_sourcing.domain.rules import evaluate, market_price, reprice
 from car_sourcing.domain.text import normalize, normalize_fuel, normalize_gearbox, parse_int
 from car_sourcing.settings import Settings, log
 from car_sourcing.web.serialize import comparable_dict, config_dict, evaluation_dict, listing_dict
@@ -53,7 +68,7 @@ class Deps:
     _config_cache: dict[str, Any] = field(default_factory=dict)
 
     def config(self) -> Config:
-        """Configuration du Sheet, mise en cache 60 s ; lève ConfigError si invalide."""
+        """Derniers réglages enregistrés, mis en cache 60 s ; lève ConfigError s'ils sont absents ou invalides."""
         cached = self._config_cache.get("value")
         if cached is not None and time.monotonic() - self._config_cache["at"] < 60:
             if isinstance(cached, ConfigError):
@@ -67,6 +82,15 @@ class Deps:
         if isinstance(value, ConfigError):
             raise value
         return value
+
+    def invalidate(self) -> None:
+        self._config_cache.clear()
+
+
+class ConfigIn(BaseModel):
+    params: dict[str, Any]
+    keywords: list[str]
+    based_on: int | None = None
 
 
 class FeedbackIn(BaseModel):
@@ -177,11 +201,79 @@ def create_app(deps: Deps) -> FastAPI:
         except ConfigError as exc:
             return None, exc.errors
 
+    def config_meta(row: dict[str, Any] | None) -> dict[str, Any] | None:
+        if row is None:
+            return None
+        saved = row.get("created_at")
+        return {
+            "number": row["number"],
+            "author": row.get("author"),
+            "savedAt": saved.timestamp() * 1000 if isinstance(saved, datetime) else None,
+        }
+
+    def validate_or_422(body: ConfigIn) -> Config:
+        try:
+            return config_from_payload({"params": body.params, "keywords": body.keywords})
+        except ConfigError as exc:
+            raise HTTPException(422, {"errors": errors_by_field(exc.errors), "messages": exc.errors}) from exc
+
     @app.get("/api/config")
     def get_config() -> dict[str, Any]:
         cfg, errors = config_or_errors()
-        sheet_url = f"https://docs.google.com/spreadsheets/d/{s.sheet_id}/edit" if s.sheet_id else None
-        return {"config": config_dict(cfg) if cfg else None, "errors": errors, "sheetUrl": sheet_url}
+        row = deps.repo.latest_config()
+        if row is not None:
+            draft = row["payload"]
+        else:
+            defaults = dict(DEFAULT_PARAMETERS)
+            draft = {
+                "params": {
+                    k: (v == "VRAI") if k == "vendeur_particulier_uniquement" else v
+                    for k, v in defaults.items()
+                },
+                "keywords": list(DEFAULT_KEYWORDS),
+            }
+        return {
+            "config": config_dict(cfg) if cfg else None,
+            "errors": errors,
+            "meta": config_meta(row),
+            "draft": draft,
+        }
+
+    @app.post("/api/config")
+    def save_config(body: ConfigIn) -> dict[str, Any]:
+        cfg = validate_or_422(body)
+        latest = deps.repo.latest_config()
+        current = latest["number"] if latest else 0
+        if body.based_on is not None and body.based_on != current:
+            raise HTTPException(
+                409, f"Les réglages ont été modifiés entre-temps (version {current}). Rechargez la page."
+            )
+        now = deps.clock()
+        deps.repo.insert_config(current + 1, payload_from_config(cfg), cfg.version, "interface", now)
+        deps.invalidate()
+        return {
+            "config": config_dict(cfg),
+            "meta": {"number": current + 1, "author": "interface", "savedAt": now.timestamp() * 1000},
+        }
+
+    @app.post("/api/config/preview")
+    def preview_config(body: ConfigIn) -> dict[str, int]:
+        """Estimation du nombre d'alertes sur 7 jours avec ces réglages, à partir des cotes déjà calculées."""
+        cfg = validate_or_422(body)
+        now = deps.clock()
+        new = prio = current = 0
+        for row in deps.repo.recent_for_preview(now - timedelta(days=7)):
+            if row.get("alert_level"):
+                current += 1
+            try:
+                listing = Listing.model_validate({k: row.get(k) for k in Listing.model_fields})
+            except ValueError:
+                continue
+            level = reprice(listing, row.get("market_price_eur"), row.get("distance_km"), cfg, now.year)
+            if level is not None:
+                new += 1
+                prio += level is AlertLevel.PRIORITAIRE
+        return {"n": new, "p": prio, "current": current}
 
     @app.get("/api/opportunities")
     def opportunities(period: int = 7) -> dict[str, Any]:
